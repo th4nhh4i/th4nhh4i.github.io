@@ -1,0 +1,969 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>BuckeyeCTF_2025 - Forensic</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+/*
+ * Toggles and callouts hold arbitrary content, so they can easily be taller
+ * than a page. They must stay breakable: avoiding breaks inside them makes
+ * Chromium push the whole block onto the next page, which leaves the previous
+ * page mostly empty before every long toggle.
+ */
+details,
+aside {
+	margin: 1.25em 0;
+}
+
+/* Keep a toggle's title on the same page as the start of its content. */
+summary {
+	page-break-after: avoid;
+	break-after: avoid;
+}
+
+/*
+ * Toggle headings render as <h1/h2/h3 style="display:inline-block"> inside
+ * <summary>. Without this reset, the heading's margin-top pushes it below the
+ * ::marker (▼), so the triangle and the title appear on separate lines.
+ */
+summary h1,
+summary h2,
+summary h3,
+summary h4 {
+	margin-top: 0;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="1b75dcdc-66b5-82a5-b654-81125be60fed" class="page sans" data-notion-page-icon="attachment:9444f8a2-7b40-4d4a-bab7-bbccad0d76f7:image.png"><header><div class="page-header-icon undefined"><img class="icon" src="image%201.png"/></div><h1 class="page-title" dir="auto"><strong>BuckeyeCTF_2025 - Forensic</strong></h1><p class="page-description" dir="auto"></p></header><div class="page-body"><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="4995dcdc-66b5-8373-affb-0117b8327f46" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="thanhhai.png"/></div><div style="width:100%"><p id="1975dcdc-66b5-839d-bba9-81cd3eeedfde" class="" dir="auto">Author : Th4nhH4i</p></div></aside><h1 id="4df5dcdc-66b5-82f1-b817-0185acb4733d" class="" dir="auto"><strong>Writeup - forensics/zip2john2zip</strong></h1><figure id="2455dcdc-66b5-8239-8c53-81df62675cff" class="image" data-notion-image="image.png" dir="ltr"><a href="image.png"><img style="width:709.984375px" src="image.png"/></a></figure><p id="9aa5dcdc-66b5-834c-bee5-019e48de92f8" class="" dir="auto"><code>Đây là đoạn mã trong hash.txt</code></p><blockquote id="3df5dcdc-66b5-82c6-ae27-8163cfb0c2a7" class="" dir="auto">flag.zip/flag.txt:$pkzip2$1<em>1</em>2<em>0</em>34<em>28</em>64ac0ae2<em>0</em>26<em>0</em>34<em>64ac</em>a388<em>2c386d49756e1d70ab5f2d8b7ccf1703b28d2775e84d89ccf4bf26d0e735e9a817b0032b5071540889c34b9331b694d6042c30a0</em>$/pkzip2$:flag.txt:flag.zip::flag.zip</blockquote><h2 id="7975dcdc-66b5-82b6-bd86-810c75f31cf8" class="" dir="auto">Các thành phần quan trọng trong hash:</h2><ul id="5475dcdc-66b5-83ac-9450-810ac081fffa" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>C=1</strong>: Số lượng hash</li></ul><ul id="a295dcdc-66b5-8366-81a7-01e4db300566" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>B=1</strong>: Số byte hợp lệ trong checksum</li></ul><ul id="49e5dcdc-66b5-8295-9879-016104a983dc" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>DT=2</strong>: Loại dữ liệu (dữ liệu đầy đủ được nhúng)</li></ul><ul id="6b15dcdc-66b5-82ec-8ff6-81832494eb14" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>CL=0x34</strong>: Độ dài dữ liệu nén (52 bytes)</li></ul><ul id="0e55dcdc-66b5-833c-b3ab-0127f9aa59ac" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>UL=0x28</strong>: Độ dài dữ liệu không nén (40 bytes)</li></ul><ul id="2375dcdc-66b5-825e-bee9-0113b2fe9765" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>CR=64ac0ae2</strong>: CRC32 cuối cùng</li></ul><ul id="93d5dcdc-66b5-82bf-8a61-011a3a2c52dd" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Blob data</strong>: Dữ liệu đã được mã hóa/nén</li></ul><h2 id="83e5dcdc-66b5-827a-81b3-8126ea22fa98" class="" dir="auto">Thành phần của đoạn mã trên </h2><p id="0515dcdc-66b5-82ff-a416-01bbfcc4c3fe" class="" dir="auto"><code><strong>flag.zip/flag.txt</strong></code><strong> : </strong>Đây là <strong>đường dẫn tệp</strong> trong kho lưu trữ ZIP.</p><ul id="0c55dcdc-66b5-833a-8126-016a3679fbc3" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>flag.zip</code> là tên file ZIP.</li></ul><ul id="8095dcdc-66b5-8339-8541-0133e7644cd1" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>flag.txt</code> là tệp bên trong ZIP.</li></ul><p id="5f05dcdc-66b5-824f-be64-013dea581760" class="" dir="auto"><code><strong>$pkzip2$</strong></code><strong> </strong></p><ul id="b115dcdc-66b5-82fa-b31e-01c0cb455cfc" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Định danh định dạng hash</strong> cho John the Ripper hoặc hashcat.</li></ul><ul id="9155dcdc-66b5-8307-801f-019774331da4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Cho biết đây là hash của file ZIP được mã hóa bằng PKZIP2.</li></ul><p id="5165dcdc-66b5-832e-a81f-811bab6171c4" class="" dir="auto"><code><strong>1*1*2*0*34*28*64ac0ae2*0*26*0*34*64ac*a388*</strong></code></p><p id="4b25dcdc-66b5-825d-8a47-01fdacafa914" class="" dir="auto">Đây là <strong>phần header</strong> của hash PKZIP2, chứa các tham số mã hóa:</p><ul id="4ef5dcdc-66b5-8306-b6f9-81745c487418" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>1</strong></code>: Phiên bản định dạng hash (1 = PKZIP2).</li></ul><ul id="47d5dcdc-66b5-8335-8caf-017d9167219c" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>1</strong></code>: Thuật toán mã hóa (1 = AES-128, 2 = AES-192, 3 = AES-256).</li></ul><ul id="0ef5dcdc-66b5-82ac-b1de-017be8def803" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>2</strong></code>: Loại dữ liệu (2 = hash của file nén).</li></ul><ul id="6e75dcdc-66b5-8308-be03-0190f3c3c952" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>0</strong></code>: Bit flags.</li></ul><ul id="1f55dcdc-66b5-83ca-b486-016cd419821b" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>34</strong></code>: Kích thước dữ liệu đã nén (0x34 = 52 byte).</li></ul><ul id="0e55dcdc-66b5-824e-be99-01e1e559b336" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>28</strong></code>: Kích thước dữ liệu gốc (0x28 = 40 byte).</li></ul><ul id="5d15dcdc-66b5-8389-aae7-813a9a42bc9d" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>64ac0ae2</strong></code>: CRC32 của dữ liệu gốc.</li></ul><ul id="5265dcdc-66b5-832a-8bac-01805e04aeba" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>0</strong></code>: Thuộc tính phần tử (0 = file).</li></ul><ul id="78f5dcdc-66b5-83c8-b775-01d3e32ae5a2" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>26</strong></code>: Kích thước field bổ sung (0x26 = 38 byte).</li></ul><ul id="8745dcdc-66b5-82e9-bcbd-01f767a630bb" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>0</strong></code>: Kích thước tên file (0 = không có tên file trong hash).</li></ul><ul id="9c75dcdc-66b5-824a-b163-81727fcf92e9" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>34</strong></code>: Kích thước field mã hóa (0x34 = 52 byte).</li></ul><ul id="b385dcdc-66b5-8257-8f0c-01d68281a36f" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>64ac</strong></code>: Salt (16 bit) dùng để tạo khóa mã hóa.</li></ul><ul id="dfe5dcdc-66b5-83ce-9e85-01df8d49d6a4" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code><strong>a388</strong></code>: Password verification value (16 bit) dùng để kiểm tra mật khẩu.</li></ul><h2 id="aed5dcdc-66b5-822a-9018-81515c0088b2" class="" dir="auto">Thử giải mã bằng john</h2><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" integrity="sha512-AKaNmg8COK0zEbjTdMHJAPJ0z6VeNqvRvH4/d5M4sHJbQQUToMBtodq4HaV4fa+WV2UTfoperElm66c9/8cKmQ==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><pre id="e035dcdc-66b5-821b-8699-814044770ca3" class="code code-wrap" data-notion-code-syntax="python"><code class="language-python" style="white-space:pre-wrap;word-break:break-all">$ john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt
+Using default input encoding: UTF-8
+Loaded 1 password hash (PKZIP [32/64])
+Will run 8 OpenMP threads
+Press &#x27;q&#x27; or Ctrl-C to abort, almost any other key for status
+factfinder       (flag.zip/flag.txt)
+
+1g 0:00:00:00 DONE (2025-11-08 12:00) 10.00g/s 9666Kp/s 9666Kc/s 9666KC/s fmxrider..dolphins_lover
+Use the &quot;--show&quot; option to display all of the cracked passwords reliably
+Session completed.</code></pre><p id="eff5dcdc-66b5-82d9-b159-014b946931f0" class="" dir="auto">Sau khi show ra thì chúng ta đã biết được pass của nó là <code>factfinder</code></p><pre id="0485dcdc-66b5-8241-b462-01cd3b83007e" class="code code-wrap" data-notion-code-syntax="python"><code class="language-python" style="white-space:pre-wrap;word-break:break-all">┌──(thanhhai㉿Kali)-[~/BuckeyeCTF_2025/Forensic]
+└─$ john --show hash.txt
+flag.zip/flag.txt:factfinder:flag.txt:flag.zip::flag.zip
+
+1 password hash cracked, 0 left</code></pre><h2 id="17f5dcdc-66b5-832c-a9b4-01093e6607fb" class="" dir="auto">Đến đây chúng ta viết scritp tái tạo lại file zip</h2><pre id="eb55dcdc-66b5-8347-b3f8-0191d9b2e40c" class="code code-wrap" data-notion-code-syntax="python"><code class="language-python" style="white-space:pre-wrap;word-break:break-all">#!/usr/bin/env python3
+# solve.py
+# Usage: python3 solve.py hash.txt out.zip
+# Rebuild a minimal zip file from a $pkzip2$...$/pkzip2$ blob in hash.txt.
+# This script is tolerant to small formatting variations (odd hex length etc).
+# It only reconstructs the zip file (does not automatically unzip).
+
+import sys
+import re
+import struct
+import binascii
+from pathlib import Path
+
+def extract_pkzip2_inner(text: str) -&gt; str | None:
+    &quot;&quot;&quot;Return the string between $pkzip2$ and $/pkzip2$ (inner content) or None.&quot;&quot;&quot;
+    m = re.search(r&#x27;\$pkzip2\$(.*?)\$/pkzip2\$&#x27;, text, flags=re.DOTALL)
+    return m.group(1) if m else None
+
+def find_longest_hex(s: str) -&gt; str | None:
+    &quot;&quot;&quot;Find the longest contiguous hex substring in s.&quot;&quot;&quot;
+    hex_pats = re.findall(r&#x27;[0-9a-fA-F]+&#x27;, s)
+    if not hex_pats:
+        return None
+    # choose the longest (most likely the ciphertext blob)
+    return max(hex_pats, key=len)
+
+def safe_unhex(hexstr: str) -&gt; bytes:
+    &quot;&quot;&quot;Try to unhexlify. If odd-length, try fixing by appending &#x27;0&#x27; or removing last nibble.&quot;&quot;&quot;
+    try:
+        return binascii.unhexlify(hexstr)
+    except (binascii.Error, ValueError) as e:
+        # odd-length or non-hex
+        # if odd-length, try appending &#x27;0&#x27; (common quick-fix) then try removing last char as fallback
+        hs = hexstr
+        if len(hs) % 2 == 1:
+            # try append &#x27;0&#x27;
+            try:
+                return binascii.unhexlify(hs + &#x27;0&#x27;)
+            except Exception:
+                pass
+            # try drop last nibble
+            try:
+                return binascii.unhexlify(hs[:-1])
+            except Exception:
+                pass
+        raise
+
+def build_minimal_zip(blob: bytes, parts: list[str], outpath: Path, filename: bytes=b&quot;flag.txt&quot;):
+    &quot;&quot;&quot;Construct minimal zip: LFH + blob + CDFH + EOCD and write to outpath.&quot;&quot;&quot;
+    # try to parse some fields if available (hex in parts)
+    def gethex(idx, default=0):
+        try:
+            return int(parts[idx], 16)
+        except Exception:
+            return default
+
+    ver_needed = 20
+    try:
+        comp = gethex(9, 0)
+        comp_size = gethex(4, len(blob))
+        uncomp_size = gethex(5, len(blob))
+        crc32 = gethex(6, 0)
+    except Exception:
+        comp = 0
+        comp_size = len(blob)
+        uncomp_size = len(blob)
+        crc32 = 0
+
+    name = filename
+    # Local File Header fixed-size fields
+    lfh_fixed = struct.pack(&quot;&lt;HHHHHIIIHH&quot;,
+                            ver_needed,  # version needed
+                            1,            # gp bit flag (set 1 as used by some zip2john output)
+                            comp,         # compression method
+                            0, 0,         # modtime, moddate
+                            crc32,
+                            comp_size,
+                            uncomp_size,
+                            len(name),
+                            0)            # extra length
+    lfh = b&quot;PK\x03\x04&quot; + lfh_fixed + name
+
+    # Central Directory File Header
+    ver_made = 20
+    disk_start = 0
+    int_file_attr = 0
+    ext_file_attr = 0
+    offset_lfh = 0  # LFH placed at file start for this minimal builder
+
+    cdfh_fixed = struct.pack(&quot;&lt;HHHHHHIIIHHHHHII&quot;,
+                             ver_made, ver_needed, 1, comp, 0, 0,
+                             crc32, comp_size, uncomp_size,
+                             len(name), 0, 0,
+                             disk_start, int_file_attr, ext_file_attr, offset_lfh)
+    cdfh = b&quot;PK\x01\x02&quot; + cdfh_fixed + name
+
+    # EOCD
+    entries_on_disk = 1
+    total_entries = 1
+    offset_cd = len(lfh) + len(blob)
+    size_cd = len(cdfh)
+    eocd = b&quot;PK\x05\x06&quot; + struct.pack(&quot;&lt;HHHHIIH&quot;,
+                                       0, 0,
+                                       entries_on_disk, total_entries,
+                                       size_cd, offset_cd,
+                                       0)
+
+    with outpath.open(&quot;wb&quot;) as fo:
+        fo.write(lfh)
+        fo.write(blob)
+        fo.write(cdfh)
+        fo.write(eocd)
+
+def main():
+    if len(sys.argv) &lt; 3:
+        print(&quot;Usage: python3 solve.py hash.txt out.zip&quot;)
+        sys.exit(1)
+
+    hashfile = Path(sys.argv[1])
+    outzip = Path(sys.argv[2])
+
+    text = hashfile.read_text(errors=&quot;ignore&quot;)
+    inner = extract_pkzip2_inner(text)
+    if inner is None:
+        print(&quot;No $pkzip2$...$/pkzip2$ block found in&quot;, hashfile)
+        sys.exit(2)
+
+    # Try to split by &#x27;*&#x27; (common) but fallback to finding hex blob
+    parts = inner.split(&#x27;*&#x27;)
+    # Attempt to find hex blob: prefer last part if it looks like hex, else find longest hex chunk
+    hex_candidate = None
+    if parts:
+        last = parts[-1].strip()
+        if re.fullmatch(r&#x27;[0-9a-fA-F]+&#x27;, last):
+            hex_candidate = last
+    if not hex_candidate:
+        hex_candidate = find_longest_hex(inner)
+
+    if not hex_candidate:
+        print(&quot;Could not find any hex blob in the $pkzip2$ block.&quot;)
+        sys.exit(3)
+
+    # Try to unhexlify robustly
+    try:
+        blob = safe_unhex(hex_candidate)
+    except Exception as e:
+        print(&quot;Failed to decode hex blob (even after fixes):&quot;, e)
+        sys.exit(4)
+
+    try:
+        build_minimal_zip(blob, parts, outzip, filename=b&quot;flag.txt&quot;)
+    except Exception as e:
+        print(&quot;Failed to build zip:&quot;, e)
+        sys.exit(5)
+
+    print(&quot;Wrote&quot;, outzip, &quot;— try: unzip -P &#x27;factfinder&#x27; {}&quot;.format(outzip))
+
+if __name__ == &quot;__main__&quot;:
+    main()
+
+#Cách chạy : python3 solve.py hash.txt flag.zip</code></pre><p id="2d15dcdc-66b5-82ae-a603-81a1379af23b" class="" dir="auto">Đến đây chúng ta sẽ được 1 file zip và giờ chỉ cần giải nén file zip ra là chúng ta nhận được Flag</p><pre id="05c5dcdc-66b5-826a-bd33-01b6723da323" class="code code-wrap" data-notion-code-syntax="python"><code class="language-python" style="white-space:pre-wrap;word-break:break-all">unzip -P &quot;factfinder&quot; flag.zip</code></pre><h2 id="f215dcdc-66b5-8264-b841-8142c016b7c3" class="" dir="auto">Vậy là chúng ta thu được Flag</h2><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-icon="🏁" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="b3a5dcdc-66b5-83e3-8d32-818d3f3db48c" dir="ltr"><div style="font-size:1.5em"><span class="icon" data-emoji="🏁"></span></div><div style="width:100%"><p id="faf5dcdc-66b5-8263-ad7a-818859cfa106" class="" dir="auto">bctf{not_all_hashes_are_hashed_equally}</p></div></aside><h1 id="20c5dcdc-66b5-839b-9777-018e64d70394" class="" dir="auto"><strong>Writeup - forensics/shredder</strong></h1><p id="7945dcdc-66b5-83f0-bd5a-01cbddfa6fff" class="" dir="auto">
+</p><h1 id="12d5dcdc-66b5-82c9-a7f6-81bdd3f78e89" class="" dir="auto"><strong>Forensics / Bugle</strong></h1><figure id="a0b5dcdc-66b5-8213-bda3-01d7600c7d2d" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_chal.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_chal.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_chal.png"/></a></figure><blockquote id="16e5dcdc-66b5-83ec-8fb1-01160ea4151c" class="" dir="auto">Toby Vulpine must have had a stroke when he made this.<blockquote id="14f5dcdc-66b5-8239-95c5-0113e07b1143" class="" dir="auto">Wrap the answer in bctf{...}, for example bctf{myanswerhere}</blockquote></blockquote><p id="e285dcdc-66b5-83d2-a01f-0107d553145e" class="" dir="auto">File provided: <code><a href="https://github.com/t4mpr/ctf-writeups/blob/main/BuckeyeCTF-2025-Writeups/files/Bugle.mp3">Bugle.mp3</a></code></p><p id="5b65dcdc-66b5-83b6-810b-8198324d6bc9" class="" dir="auto">This was a fun challenge. We&#x27;re provided with an mp3 audio file that sounds like a trumpet playing a song. If we analyze the audio file through various Spectogram Analysis tools, nothing obvious comes to mind.</p><p id="4215dcdc-66b5-8224-838b-01157e68c61f" class="" dir="auto"><strong>Morse Code</strong></p><ul id="2fc5dcdc-66b5-83ab-aea7-017b85f7bd15" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Google defines <strong>Morse code</strong> as <code>an alphabet or code in which letters are represented by combinations of long and short signals of light or sound.</code></li></ul><ul id="3685dcdc-66b5-8376-8104-01232e5bfd40" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Morse Code</strong> is a form of encoding can be integrated into steganographic methods by hiding the Morse code signals within an innocuous &quot;cover&quot; medium in a way that conceals the very existence of a hidden message can be delivered in many formats, spikes in volume, light, patterns, tones...</li></ul><p id="b6a5dcdc-66b5-83b0-ae26-012c7a78ea32" class="" dir="auto"><strong>Audio File Analysis</strong></p><p id="6ab5dcdc-66b5-82f2-b04d-8180db7401c6" class="" dir="auto">We can start by simply listening to and viewing the audio in any DAW or audio visualization tool.</p><ul id="c595dcdc-66b5-83a0-a891-81699ee44e1e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Let&#x27;s start with Sonic Visualizer</li></ul><figure id="5445dcdc-66b5-82c4-96a7-01e300ec9975" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Sonic.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Sonic.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Sonic.png"/></a></figure><p id="fd45dcdc-66b5-823c-8c9b-81d989f2efda" class="" dir="auto">Hmmm...Nothing too obvious here. However, we do see some clean breaks in-between notes. This could be an indicator that this may be morse code.</p><blockquote id="0bd5dcdc-66b5-823f-abd0-811726d365ec" class="" dir="auto">When analyzing Morse Code, we need SOMETHING in between - and . - A space, a consistent break. Something to tell us where to separate each character.</blockquote><p id="e515dcdc-66b5-8357-bf45-814d99c6164d" class="" dir="auto">If we load this up into an online tool <a href="https://musitools.xyz/musigram/">MusicGram</a>, we see further confirmation of <strong>Morse Code</strong></p><figure id="6c45dcdc-66b5-8242-986d-819dea91935a" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_MusicGram_Rawpng.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_MusicGram_Rawpng.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_MusicGram_Rawpng.png"/></a></figure><p id="83a5dcdc-66b5-834a-85e1-011015439f9a" class="" dir="auto"><em>&quot;How is this Morse Code?&quot;</em> You may ask...</p><p id="b1b5dcdc-66b5-8397-8d93-81e6fbd11113" class="" dir="auto"><strong>Let&#x27;s take a closer look...</strong></p><p id="f135dcdc-66b5-82d5-806a-0139373eac5f" class="" dir="auto">Load the .mp3 into your DAW <em>(Digital Audio Workstation)</em> of choice...</p><ul id="b8f5dcdc-66b5-82ce-a396-010bc5ca5aee" class="bulleted-list" dir="auto"><li style="list-style-type:disc">For this example, I use <strong>Ableton 12</strong></li></ul><figure id="79f5dcdc-66b5-8283-aa82-815292f1197e" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_1st.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_1st.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_1st.png"/></a></figure><p id="8495dcdc-66b5-837b-b1bc-81aabefb5866" class="" dir="auto"><strong>...Now do you see it?</strong></p><p id="a675dcdc-66b5-824f-a2ac-81444998f861" class="" dir="auto">﴾͡๏̯͡๏﴿</p><figure id="c835dcdc-66b5-8286-a4ff-0124b5f4b9c2" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_1.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_1.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_1.png"/></a></figure><p id="23a5dcdc-66b5-83d0-af90-8128070c96b0" class="" dir="auto"><strong>...How about now?</strong></p><figure id="2b05dcdc-66b5-8308-b96c-013c334db38c" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle%20First%20Notes.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle%20First%20Notes.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle%20First%20Notes.png"/></a></figure><p id="bf45dcdc-66b5-8207-943d-81512aa72466" class="" dir="auto"><strong>Aha! NOW we&#x27;re getting the hang of it!</strong></p><p id="71d5dcdc-66b5-833c-9fe2-0128c862e9cd" class="" dir="auto">( ━☞´◔‿ゝ◔`)━☞</p><figure id="fca5dcdc-66b5-8397-aeab-8160961b8aa2" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_small.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_small.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_small.png"/></a></figure><h3 id="0c15dcdc-66b5-83f9-a596-81d53b19c033" class="" dir="auto"></h3><blockquote id="f065dcdc-66b5-826d-b75b-015efe38d706" class="" dir="auto">In Ableton Grid view, a 1/4 of a bar is shown by zooming in. Notice the two different shades of grey. If you&#x27;re not familiar with Ableton, just think of one of those grey blocks as one quarter of a bar.</blockquote><figure id="5405dcdc-66b5-8345-a773-811caddbe029" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_2nd.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_2nd.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Ableton_2nd.png"/></a></figure><ul id="6745dcdc-66b5-828a-baf3-015f96131407" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Notes that play for 1/4 of a bar represents a </strong></li></ul><ul id="9ed5dcdc-66b5-8202-b1cc-0137c598b338" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><strong>Notes that play for an 8th of a bar represent a </strong><code><strong>.</strong></code></li></ul><p id="8e65dcdc-66b5-8370-98ec-81e1d640bced" class="" dir="auto">I chopped each note individually and cut all of the negative space to isolate each character. This helped me visualize the <code>-</code>&#x27;s and <code>.</code>&#x27;s</p><blockquote id="76c5dcdc-66b5-83a8-9ac5-816f062f3b17" class="" dir="auto">I&#x27;ve included the Chopped Bugle Audio file here as well.</blockquote><p id="46d5dcdc-66b5-8314-b1a9-81f28ff59175" class="" dir="auto">If you go through the entire audio file, listening to each note and color-coding them for easy visualization, you&#x27;ll end up with <code>-- --- .-. ... . .- .-.. .-.. .- .-.. --- -. --.</code></p><p id="b145dcdc-66b5-8243-9ffa-81bfb74c9e30" class="" dir="auto">You can then use <a href="https://gchq.github.io/CyberChef/#recipe=From_Morse_Code(&#x27;Space&#x27;,&#x27;Line%20feed&#x27;)&amp;input=LS0gLS0tIC4tLiAuLi4gLiAuLSAuLS4uIC4tLi4gLi0gLi0uLiAtLS0gLS4gLS0u&amp;ieol=CRLF">CyberChef</a> or another Morse Code Decoder to recover the decoded message.</p><p id="77f5dcdc-66b5-82ec-9c15-01012222f3b4" class="" dir="auto"><strong>Visual Representation</strong></p><figure id="b5a5dcdc-66b5-82c9-b762-81abc176b05b" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle%20First%20Notes_MOR.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle%20First%20Notes_MOR.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle%20First%20Notes_MOR.png"/></a></figure><figure id="9ad5dcdc-66b5-8380-9922-0168cdb3d03b" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Middle_Notes_SEAL.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Middle_Notes_SEAL.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Middle_Notes_SEAL.png"/></a></figure><figure id="bfd5dcdc-66b5-826e-944f-815d5ff5d3e0" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Middle_Notes_LAL.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Middle_Notes_LAL.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Middle_Notes_LAL.png"/></a></figure><figure id="39b5dcdc-66b5-83bd-a1f7-81af3d37de14" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_LAST%20NOTES_Notes_ONG.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_LAST%20NOTES_Notes_ONG.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_LAST%20NOTES_Notes_ONG.png"/></a></figure><p id="e7c5dcdc-66b5-823f-a24e-01029c67d04c" class="" dir="auto"><strong>Alternative Solution</strong></p><p id="b915dcdc-66b5-83ea-bfc8-813a00a99d71" class="" dir="auto">Rather than having to load the audio into a DAW, chop the notes up and color-code everything while manually listening and taking notes. You could use the <a href="https://musitools.xyz/musigram/">Musicgram spectrogram tool</a> and decode the morse just by looking at it...</p><p id="d005dcdc-66b5-839d-bcf0-016a149ab27a" class="" dir="auto">But <em>&quot;How?&quot;</em> You may ask...</p><h3 id="6ee5dcdc-66b5-83b3-9207-01145b722814" class="" dir="auto"></h3><p id="5bc5dcdc-66b5-83c6-96c8-0108257b7dd4" class="" dir="auto"><strong>(ง&#x27;̀-&#x27;́)ง</strong></p><figure id="ea95dcdc-66b5-826f-8547-814c0b82b02f" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Musicgram.jpg" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Musicgram.jpg"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Musicgram.jpg"/></a></figure><ul id="7f15dcdc-66b5-839a-9b07-01c7079e86eb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">This is important when trying to decode morse, <strong>knowing where the breaks are</strong>, otherwise you&#x27;ll end up something totally different than what is intended to be decoded.</li></ul><ul id="6f35dcdc-66b5-8394-bd11-0118804d2383" class="bulleted-list" dir="auto"><li style="list-style-type:disc">If you don&#x27;t understand where the breaks are, you may end up convincing yourself that <strong>it&#x27;s not Morse Code. (╯°□°）╯︵ ┻━┻</strong></li></ul><p id="7195dcdc-66b5-835b-8721-016396add4e7" class="" dir="auto"><strong>Visual Representation of Bugle.mp3 decoded using </strong><strong><a href="https://musitools.xyz/musigram/">musitools.xyz/musigram</a></strong></p><p id="56e5dcdc-66b5-83d9-ac53-812bf2bbdfae" class="" dir="auto"><strong>♪~ ᕕ(ᐛ)ᕗ</strong></p><figure id="13b5dcdc-66b5-8328-b7cb-81b4cd5071e5" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Musicgram_Drawn_w_Letters.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Musicgram_Drawn_w_Letters.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/Bugle_Musicgram_Drawn_w_Letters.png"/></a></figure><p id="04a5dcdc-66b5-823d-b43f-01d5fe9f673f" class="" dir="auto"><strong>Conclusion</strong></p><p id="7fc5dcdc-66b5-8335-91fb-8126916feb20" class="" dir="auto">Flag - <code>bctf{MORSEALLALONG}</code></p><ul id="fe15dcdc-66b5-82db-85b5-01ba22ebe548" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Shout out to the <a href="https://pwnoh.io/">Buckeye CTF</a> Staff for putting on a great event</li></ul><ul id="0755dcdc-66b5-8257-93b2-01f65f1b41d9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">And of course my team, <a href="https://l3ak.team/">L3ak</a> for coming in 1st place in the Open Division<figure id="c4e5dcdc-66b5-8387-83fd-81c041d9430b" class="image" data-notion-image="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/L3ak.png" dir="ltr"><a href="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/L3ak.png"><img src="https://github.com/t4mpr/ctf-writeups/raw/main/BuckeyeCTF-2025-Writeups/images/L3ak.png"/></a></figure></li></ul><p id="bad5dcdc-66b5-824d-a70b-814bd08ea3e7" class="" dir="auto"><em><strong>If you enjoyed this walkthrough. Please give this repo a ⭐ and follow my GitHub for more</strong></em></p><p id="3b05dcdc-66b5-8079-8ad4-d607c4cb37c9" class="" dir="auto">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

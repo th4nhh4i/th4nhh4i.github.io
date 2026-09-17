@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0b0e">
+  <meta name="description" content="Field Notes — writeup CTF, báo cáo lab Purple Team và bài báo về Lê Thanh Hải.">
+  <meta property="og:title" content="Field Notes — Lê Thanh Hải">
+  <meta property="og:description" content="Writeup CTF, lab Purple Team và những điều học được về an toàn thông tin.">
+  <meta property="og:type" content="website">
+  <title>Field Notes — Lê Thanh Hải</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="portfolio.css">
+  <link rel="stylesheet" href="journal.css">
+  <link rel="stylesheet" href="evidence.css?v=12">
+  <link rel="stylesheet" href="appearance.css?v=1">
+  <script src="appearance.js?v=1"></script>
+  <script>
+    /* Chạy sớm: bật reveal và phủ màn nếu vừa chuyển trang; tự gỡ nếu app.js không tải được. */
+    (function () {
+      var root = document.documentElement;
+      root.classList.add('js');
+      try {
+        var saved = localStorage.getItem('th4nhh4i-motion');
+        var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var motion = saved !== 'off' && !reduced;
+        var arrival = JSON.parse(sessionStorage.getItem('th4nhh4i-arrival') || 'null');
+        if (motion && arrival && arrival.href === location.href && Date.now() - arrival.t < 15000) root.classList.add('is-arriving');
+      } catch (e) { }
+      setTimeout(function () { if (!window.th4nhh4iReady) root.classList.remove('js', 'is-arriving'); }, 3000);
+    })();
+  </script>
+  <script src="app.js?v=6" defer></script>
+  <script src="journal.js" defer></script>
+</head>
+<body class="journal-page">
+  <svg class="note-sprite" width="0" height="0" aria-hidden="true" style="position:absolute">
+    <symbol id="i-date" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-words" viewBox="0 0 24 24"><path d="M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20z"/><path d="M14 7l3 3"/></symbol>
+    <symbol id="i-time" viewBox="0 0 24 24"><path d="M6 3h12M6 21h12M8 3v3a4 4 0 0 0 8 0V3M8 21v-3a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-source" viewBox="0 0 24 24"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5"/></symbol>
+  </svg>
+  <a class="skip-link" href="#journal-library">Đến thư viện bài viết</a>
+
+  <div id="page-transition" aria-hidden="true">
+    <div class="transition-inner">
+      <div class="transition-top mono"><span><span class="transition-dot"></span> CHAIN OF CUSTODY · TRANSFER</span><span class="transition-route">/field-notes → /portfolio</span></div>
+      <p class="transition-label">Portfolio.</p>
+      <div class="transition-chain"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i></div>
+      <div class="transition-meta mono"><span class="transition-hash">sha256 · ················</span><span class="transition-status">HASHING EVIDENCE…</span></div>
+      <div class="transition-progress"></div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Th4nhH4i — Trang chủ" data-transition-label="Portfolio."><span class="brand-symbol" aria-hidden="true">✳</span> th4nhh4i<span>.</span></a>
+    <nav class="main-nav" id="main-nav" aria-label="Điều hướng chính">
+      <a href="index.html#home" data-transition-label="Portfolio.">Trang chủ</a>
+      <a href="index.html#projects" data-transition-label="Selected Work.">Dự án</a>
+      <a href="index.html#skills" data-transition-label="Toolkit.">Kỹ năng</a>
+      <a href="index.html#resume" data-transition-label="The Journey.">Hành trình</a>
+      <a href="blog.html" class="is-active" aria-current="page">Bài viết <span aria-hidden="true">↗</span></a>
+    </nav>
+    <a href="index.html#contact" class="header-contact" data-transition-label="Let's connect.">Cùng kết nối <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-label="Mở menu" aria-expanded="false" aria-controls="main-nav"><span></span><span></span></button>
+  </header>
+
+  <main id="main">
+    <section class="journal-shell journal-hero" aria-labelledby="journal-title">
+      <div class="journal-intro">
+        <p class="journal-eyebrow"><span class="journal-status-dot"></span> FIELD NOTES <span class="journal-eyebrow-index">/ EVIDENCE LOCKER</span></p>
+        <h1 id="journal-title">Học được gì,<br>mình <span>viết lại.</span></h1>
+        <p class="journal-lead">Writeup CTF, báo cáo lab Purple Team và những lần được nhắc tên. Mỗi ghi chép là một vật chứng — lưu lại cách mình đi từ dấu vết đến lời giải.</p>
+        <a class="journal-explore" href="#journal-library">Mở thư viện <span aria-hidden="true">↓</span></a>
+      </div>
+      <aside class="journal-counter" aria-label="Thống kê ghi chép">
+        <div class="counter-top"><span>EVIDENCE LOCKER</span><span>/var/notes</span></div>
+        <div class="counter-total"><b data-count="all">35</b><span>ghi chép<br>đã lưu trữ</span></div>
+        <div class="counter-grid">
+          <div><b data-count="writeup">20</b><span>Write-ups</span></div>
+          <div><b data-count="lab">07</b><span>Labs</span></div>
+          <div><b data-count="press">08</b><span>Báo chí & đưa tin</span></div>
+        </div>
+        <div class="counter-bottom"><span class="journal-status-dot"></span> SHA-256 INDEXED · CẬP NHẬT <span data-latest>—</span></div>
+      </aside>
+    </section>
+
+    <section class="journal-shell journal-library" id="journal-library" aria-labelledby="library-title">
+      <div class="library-heading">
+        <div>
+          <p class="journal-eyebrow">THE LIBRARY</p>
+          <h2 id="library-title">Tất cả <span>ghi chép.</span></h2>
+        </div>
+        <span class="library-code">grep -ri "curiosity" ./notes</span>
+      </div>
+
+      <div class="journal-toolbar">
+        <label class="journal-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="visually-hidden">Tìm bài viết</span>
+          <input type="search" id="blogSearch" placeholder="Tìm theo tên giải, kỹ thuật, công cụ…" autocomplete="off" spellcheck="false">
+          <kbd aria-hidden="true">/</kbd>
+        </label>
+        <label class="journal-sort">
+          <span>Sắp xếp</span>
+          <select id="blogSort" aria-label="Sắp xếp bài viết">
+            <option value="desc">Mới nhất</option>
+            <option value="asc">Cũ nhất</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="journal-filter-row">
+        <div class="blog-filters" role="group" aria-label="Lọc theo loại ghi chép">
+          <button type="button" class="blog-filter-btn active" data-filter="all" aria-pressed="true">Tất cả <span data-count="all">35</span></button>
+          <button type="button" class="blog-filter-btn" data-filter="writeup" aria-pressed="false">Write-ups <span data-count="writeup">20</span></button>
+          <button type="button" class="blog-filter-btn" data-filter="lab" aria-pressed="false">Labs <span data-count="lab">07</span></button>
+          <button type="button" class="blog-filter-btn" data-filter="press" aria-pressed="false">Báo chí <span data-count="press">08</span></button>
+        </div>
+        <p class="journal-result-count" id="resultCount" role="status" aria-live="polite">35 bài viết</p>
+      </div>
+
+      <details class="journal-tag-picker">
+        <summary><span><span aria-hidden="true">#</span> Chủ đề: <strong id="selectedTagLabel">Tất cả chủ đề</strong></span><span data-tag-count>Chọn chủ đề</span></summary>
+        <div class="blog-tag-pills-cloud" id="tagFiltersCloud"></div>
+      </details>
+
+      <div class="notes-list" id="blogGrid">
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup security bootcamp dak lak cyberjutsu can you remember malware analysis graph traversal csp active learning 2026" data-date="2026-09-10">
+          <a class="note-cover has-image" href="wu/security-bootcamp-dak-lak-2026/index.html" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="images/ctf/security-bootcamp-dak-lak-2026.png" alt="" loading="lazy"><span class="note-cover-meta">SECURITY BOOTCAMP · ĐẮK LẮK 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-09-10">09–10/09/2026</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>3,100 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>17 mins</span></div>
+            <h3 class="note-title"><a href="wu/security-bootcamp-dak-lak-2026/index.html" target="_blank" rel="noopener noreferrer">Security Bootcamp Đắk Lắk 2026 — Can You Remember 1 &amp; 2</a></h3>
+            <p class="note-excerpt">Writeup cặp thử thách Misc 5.000 điểm tại Security Bootcamp Đắk Lắk 2026: nhận diện 15 họ malware, dựng lại mạng 20 host từ các warp vô danh và dùng CSP cùng active learning để chinh phục cả hai flag với điểm tuyệt đối 100/100.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">Security Bootcamp</span><span class="blog-tag-pill">CyberJutsu</span><span class="blog-tag-pill">Malware Analysis</span><span class="blog-tag-pill">Graph Traversal</span><span class="blog-tag-pill">CSP</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup forensics blackhat mea qualification 2026 defender quarantine rc4 aes ollama dfir" data-date="2026-09-05">
+          <a class="note-cover" style="--cover:#0f172a;--cover-ink:#ffffff" href="wu/BlackHat_MEA_2026/index.html" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo is-dark" src="images/ctf/blackhat-mea.jpg" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-09-05">2026-09-05</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1581 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>8 mins</span></div>
+            <h3 class="note-title"><a href="wu/BlackHat_MEA_2026/index.html" target="_blank" rel="noopener noreferrer">BlackHat MEA Qualification CTF 2026 - Forensics Writeups</a></h3>
+            <p class="note-excerpt">Hai thử thách Forensics tại vòng loại BlackHat MEA 2026 (05 – 06/09/2026): khôi phục file HTA từ Windows Defender Quarantine (RC4) rồi dựng lại IV để giải mã AES-256-CBC, và lần dấu một LLM Ollama chạy local bị dùng để soạn mã đánh cắp dữ liệu.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CTF</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">BlackHat MEA</span><span class="blog-tag-pill">Defender Quarantine</span><span class="blog-tag-pill">Ollama</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup tcm security noob packet analysis wireshark pcap forensics memory cryptography caesar vigenere malware analysis phishing osint whois wayback git web exploitation cookie jwt 2026" data-date="2026-08-06">
+          <a class="note-cover" style="--cover:#5b21b6;--cover-ink:#ffffff" href="https://app.notion.com/p/TCM-SECURITY-3b85dcdc66b5801ba41ad413d0efc9aa" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo is-wide" src="images/ctf/tcm.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-08-06">2026-08-06</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,115 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>6 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/TCM-SECURITY-3b85dcdc66b5801ba41ad413d0efc9aa" target="_blank" rel="noopener noreferrer">TCM Security CTF - Packet Analysis, Forensics, OSINT &amp; Web Writeups</a></h3>
+            <p class="note-excerpt">Tổng hợp writeup 16 thử thách tại giải CTF của TCM Security: phân tích PCAP bằng Wireshark, điều tra RAM và file bị xóa, giải mã Caesar/Vigenère, phân tích mã độc, OSINT với Whois/Wayback/Git và khai thác web qua cookie, JWT.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">TCM Security</span><span class="blog-tag-pill">Packet Analysis</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">OSINT</span><span class="blog-tag-pill">Web</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="lab" data-tags="privilege escalation linux wazuh blue team sudo find soc" data-date="2026-01-14">
+          <a class="note-cover has-image" href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab1" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="blog/assets/lab1_architecture.png" alt="" loading="lazy"><span class="note-cover-meta">LAB 01 · BLUE TEAM</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,326 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>10 mins</span></div>
+            <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab1" target="_blank" rel="noopener noreferrer">Phát hiện leo thang đặc quyền trên Linux bằng Wazuh</a></h3>
+            <p class="note-excerpt">Mô phỏng tài khoản thường lạm dụng sudo find để mở shell root, xây dựng rule phát hiện và thực hành xử lý sự cố.</p>
+            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Linux</span><span class="blog-tag-pill">Wazuh</span><span class="blog-tag-pill">Privilege Escalation</span><span class="blog-tag-pill">SOC</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="lab" data-tags="ransomware ai agent skill sysmon wazuh powershell blue team" data-date="2026-01-14">
+          <a class="note-cover has-image" href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab2" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="blog/assets/lab2_architecture.png" alt="" loading="lazy"><span class="note-cover-meta">LAB 02 · BLUE TEAM</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,128 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>12 mins</span></div>
+            <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab2" target="_blank" rel="noopener noreferrer">Phát hiện ransomware giả dạng file cấu hình AI Agent</a></h3>
+            <p class="note-excerpt">Mô phỏng tệp update-Skill-AI.bat gọi PowerShell mã hóa dữ liệu và phát hiện chuỗi thực thi bằng Sysmon, Wazuh.</p>
+            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Ransomware</span><span class="blog-tag-pill">Sysmon</span><span class="blog-tag-pill">Wazuh</span><span class="blog-tag-pill">PowerShell</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="lab" data-tags="insider threat data exfiltration sysmon wazuh blue team" data-date="2026-01-14">
+          <a class="note-cover has-image" href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab3" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="blog/assets/lab3_architecture.png" alt="" loading="lazy"><span class="note-cover-meta">LAB 03 · BLUE TEAM</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,039 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>10 mins</span></div>
+            <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab3" target="_blank" rel="noopener noreferrer">Phát hiện Insider Threat đánh cắp dữ liệu nội bộ</a></h3>
+            <p class="note-excerpt">Mô phỏng nhân viên thu thập, nén và tải dữ liệu nhạy cảm ra máy chủ bên ngoài; phát hiện bằng Sysmon và Wazuh.</p>
+            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Insider Threat</span><span class="blog-tag-pill">Data Exfiltration</span><span class="blog-tag-pill">Sysmon</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="lab" data-tags="brute force ssh rdp wazuh hydra blue team" data-date="2026-01-14">
+          <a class="note-cover has-image" href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab4" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="blog/assets/lab4_architecture.png" alt="" loading="lazy"><span class="note-cover-meta">LAB 04 · BLUE TEAM</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,012 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>9 mins</span></div>
+            <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab4" target="_blank" rel="noopener noreferrer">Phát hiện Brute Force SSH và RDP bằng Wazuh</a></h3>
+            <p class="note-excerpt">Mô phỏng Hydra dò mật khẩu SSH/RDP, phân tích log xác thực và xây dựng custom rule mức nghiêm trọng cao.</p>
+            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Brute Force</span><span class="blog-tag-pill">SSH</span><span class="blog-tag-pill">RDP</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="lab" data-tags="reverse shell meterpreter sysmon wazuh blue team" data-date="2026-01-14">
+          <a class="note-cover has-image" href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab5" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="blog/assets/lab5_architecture.png" alt="" loading="lazy"><span class="note-cover-meta">LAB 05 · BLUE TEAM</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,050 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>11 mins</span></div>
+            <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab5" target="_blank" rel="noopener noreferrer">Phát hiện Reverse Shell và hành vi tạo tài khoản quản trị</a></h3>
+            <p class="note-excerpt">Mô phỏng Meterpreter reverse shell, theo dõi Sysmon/Wazuh và phát hiện tạo user, thêm user vào Administrators.</p>
+            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Reverse Shell</span><span class="blog-tag-pill">Meterpreter</span><span class="blog-tag-pill">Sysmon</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="lab" data-tags="network scanning reconnaissance nmap wazuh blue team" data-date="2026-01-14">
+          <a class="note-cover has-image" href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab6" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="blog/assets/lab6_architecture.png" alt="" loading="lazy"><span class="note-cover-meta">LAB 06 · BLUE TEAM</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,077 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>10 mins</span></div>
+            <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab6" target="_blank" rel="noopener noreferrer">Phát hiện Network Scanning và Reconnaissance</a></h3>
+            <p class="note-excerpt">Mô phỏng Nmap quét mạng, nhận diện dịch vụ, kiểm tra lỗ hổng và phát hiện bằng Windows Firewall log cùng Wazuh.</p>
+            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Nmap</span><span class="blog-tag-pill">Network Scanning</span><span class="blog-tag-pill">Reconnaissance</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="lab" data-tags="purple team ransomware phishing incident response disaster recovery c2 powershell" data-date="2026-01-14">
+          <a class="note-cover has-image" href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab7" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="blog/assets/lab8_topology.png" alt="" loading="lazy"><span class="note-cover-meta">LAB 07 · PURPLE TEAM</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,547 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>15 mins</span></div>
+            <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab7" target="_blank" rel="noopener noreferrer">Purple Team: Ransomware qua Phishing Email và Disaster Recovery</a></h3>
+            <p class="note-excerpt">Mô phỏng vòng đời ransomware từ phishing, PowerShell C2, credential access, lateral movement đến mã hóa và khôi phục Disaster Recovery.</p>
+            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Purple Team</span><span class="blog-tag-pill">Ransomware</span><span class="blog-tag-pill">Phishing</span><span class="blog-tag-pill">Incident Response</span><span class="blog-tag-pill">Disaster Recovery</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup forensics volatility zip2john morse audio buckeyectf 2025" data-date="2025-11-08">
+          <a class="note-cover" style="--cover:#a4161a;--cover-ink:#ffffff" href="wu/BuckeyeCTF_2025/BuckeyeCTF_2025%20-%20Forensic%201b75dcdc66b582a5b65481125be60fed.html" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/buckeye.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-11-08">2025-11-08</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>781 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>8 mins</span></div>
+            <h3 class="note-title"><a href="wu/BuckeyeCTF_2025/BuckeyeCTF_2025%20-%20Forensic%201b75dcdc66b582a5b65481125be60fed.html" target="_blank" rel="noopener noreferrer">BuckeyeCTF 2025 - Phân tích bộ nhớ &amp; Digital Forensics</a></h3>
+            <p class="note-excerpt">Tổng hợp lời giải thử thách Digital Forensics tại BuckeyeCTF 2025 (08/11 - 10/11/2025): bẻ khóa hash ZIP PKZIP2 &amp; giải mã Morse trong âm thanh Bugle.mp3.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CTF</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">Volatility</span><span class="blog-tag-pill">Zip2John</span><span class="blog-tag-pill">Morse Code</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup crypto sagemath gf2 matrix linear algebra patriotctf 2025" data-date="2025-11-21">
+          <a class="note-cover" style="--cover:#1f3a93;--cover-ink:#ffffff" href="wu/Patriot%20CTF%202025/Patriot%20CTF%202025%20d345dcdc66b582ef883c0112cb088f77.html" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/patriot.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-11-21">2025-11-21</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>351 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>6 mins</span></div>
+            <h3 class="note-title"><a href="wu/Patriot%20CTF%202025/Patriot%20CTF%202025%20d345dcdc66b582ef883c0112cb088f77.html" target="_blank" rel="noopener noreferrer">Patriot CTF 2025 - Cryptography &amp; Matrix Reconstruction</a></h3>
+            <p class="note-excerpt">Writeup chi tiết thử thách Cryptography (Matrix Reconstruction - 382 pts) tại PatriotCTF 2025: Xây dựng hệ phương trình tuyến tính trên GF(2) khôi phục ma trận A, B.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CTF</span><span class="blog-tag-pill">Crypto</span><span class="blog-tag-pill">SageMath</span><span class="blog-tag-pill">GF(2)</span><span class="blog-tag-pill">Matrix</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup rev crypto osint misc forensic vitctf v1t ctf 2025" data-date="2025-11-02">
+          <a class="note-cover" style="--cover:#0f766e;--cover-ink:#ffffff" href="https://app.notion.com/p/VitCTF-2025-ff45dcdc66b583e59cb6015f3fa3267e" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/vitctf.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-11-02">2025-11-02</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>7 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/VitCTF-2025-ff45dcdc66b583e59cb6015f3fa3267e" target="_blank" rel="noopener noreferrer">V1T CTF 2025 - Tổng hợp Writeup Các Thử Thách</a></h3>
+            <p class="note-excerpt">Tổng hợp lời giải chi tiết chuỗi thử thách Reverse Engineering, Cryptography, OSINT, Misc và Digital Forensics tại giải đấu V1T CTF 2025.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CTF</span><span class="blog-tag-pill">Rev</span><span class="blog-tag-pill">Crypto</span><span class="blog-tag-pill">OSINT</span><span class="blog-tag-pill">Forensics</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup prompt injection ai security llm cyberjutsu" data-date="2025-11-15">
+          <a class="note-cover" style="--cover:#8f1d1d;--cover-ink:#ffffff" href="https://app.notion.com/p/CyberJutsu-Academy-aaa5dcdc66b5820e80b40150bae16e70" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo is-wide" src="images/ctf/cyberjutsu.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-11-15">2025-11-15</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>5 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/CyberJutsu-Academy-aaa5dcdc66b5820e80b40150bae16e70" target="_blank" rel="noopener noreferrer">CyberJutsu Academy - Prompt Injection &amp; AI Security</a></h3>
+            <p class="note-excerpt">Phân tích kỹ thuật Prompt Injection bẻ khóa các AI Chatbot/Prompt Guard tại CyberJutsu Academy (Roleplay RPG &amp; Sci-Fi storytelling completion).</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CTF</span><span class="blog-tag-pill">Prompt Injection</span><span class="blog-tag-pill">AI Security</span><span class="blog-tag-pill">LLM</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup hackathon genai ai security attack defense rmit 2025" data-date="2025-10-20">
+          <a class="note-cover is-short" style="--cover:#c8102e;--cover-ink:#ffffff" href="https://app.notion.com/p/RMIT-HACKATHON-2025-6bf5dcdc66b582cea215819d0c636258" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/rmit.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-10-20">2025-10-20</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>6 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/RMIT-HACKATHON-2025-6bf5dcdc66b582cea215819d0c636258" target="_blank" rel="noopener noreferrer">RMIT Hackathon 2025 - GenAI &amp; Attack/Defense</a></h3>
+            <p class="note-excerpt">Writeup &amp; trải nghiệm giải RMIT GenAI &amp; Cybersecurity Hackathon 2025 bởi team GDU_G0ld3n_Kn1ght: Thách thức Attack &amp; Defense kết hợp AI trên Kaggle &amp; RMIT RACE Cloud.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">Hackathon</span><span class="blog-tag-pill">GenAI</span><span class="blog-tag-pill">AI Security</span><span class="blog-tag-pill">Attack-Defense</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup forensics rev reverse engineering cookie han hoan practice" data-date="2025-09-10">
+          <a class="note-cover" style="--cover:#8a4b0f;--cover-ink:#ffffff" href="https://app.notion.com/p/CTF-Cookie-H-n-Hoan-ec95dcdc66b5820c8512014cdc5bbb69" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/cookie.jpg" alt="" loading="lazy" onerror="this.outerHTML='&lt;span class=&quot;note-cover-mark&quot;&gt;COOKIE&lt;/span&gt;'"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-09-10">2025-09-10</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>5 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/CTF-Cookie-H-n-Hoan-ec95dcdc66b5820c8512014cdc5bbb69" target="_blank" rel="noopener noreferrer">CTF - Cookie Hân Hoan (Luyện Tập Forensics &amp; Rev)</a></h3>
+            <p class="note-excerpt">Tổng hợp bài giải luyện tập CTF Cookie Hân Hoan: Kỹ thuật phân tích dấu vết Digital Forensics &amp; Reverse Engineering phân tích mã máy.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CTF</span><span class="blog-tag-pill">Cookie Hân Hoan</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">Rev</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup hackthebox htb web hardware ics forensics rev" data-date="2025-08-18">
+          <a class="note-cover is-short" style="--cover:#111927;--cover-ink:#9fef00" href="https://app.notion.com/p/HTB-CTF-Try-Out-9395dcdc66b583bf96e90146580eb54a" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo is-wide is-dark" src="images/ctf/htb.svg" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-08-18">2025-08-18</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>8 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/HTB-CTF-Try-Out-9395dcdc66b583bf96e90146580eb54a" target="_blank" rel="noopener noreferrer">Hack The Box - CTF Try Out (Web, Hardware, ICS &amp; Forensics)</a></h3>
+            <p class="note-excerpt">Tổng hợp writeup giải các thử thách HTB CTF Try Out: Web Exploitation, Reversing, Hardware PCB Forensics &amp; ICS Protocols.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">HTB</span><span class="blog-tag-pill">Web</span><span class="blog-tag-pill">Hardware</span><span class="blog-tag-pill">ICS</span><span class="blog-tag-pill">Forensics</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup heroctf rev reverse engineering binary 2025" data-date="2025-11-28">
+          <a class="note-cover is-short" style="--cover:#7c2d12;--cover-ink:#ffffff" href="https://app.notion.com/p/Hero-CTF-2025-af55dcdc66b583f28a888139ec1055a6" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/heroctf.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-11-28">2025-11-28</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>6 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/Hero-CTF-2025-af55dcdc66b583f28a888139ec1055a6" target="_blank" rel="noopener noreferrer">Hero CTF 2025 - Reverse Engineering &amp; Binary Analysis</a></h3>
+            <p class="note-excerpt">Phân tích &amp; giải chi tiết các bài tập Reverse Engineering (The Chef's Secret Recipe, Apprentice of the IR Forge) tại giải Hero CTF 2025.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">HeroCTF</span><span class="blog-tag-pill">Rev</span><span class="blog-tag-pill">Reverse Engineering</span><span class="blog-tag-pill">Binary Analysis</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup cscv 2025 sinh vien an ninh mang web forensics dfir rev reverse" data-date="2025-11-15">
+          <a class="note-cover is-short" style="--cover:#1e40af;--cover-ink:#ffffff" href="wu/CSCV_2025_Final/index.html" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-poster" src="images/ctf/cscv.jpg" alt="" loading="lazy" onerror="this.outerHTML='&lt;span class=&quot;note-cover-mark&quot;&gt;CSCV&lt;/span&gt;'"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-11-15">2025-11-15</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>3200 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>16 mins</span></div>
+            <h3 class="note-title"><a href="wu/CSCV_2025_Final/index.html" target="_blank" rel="noopener noreferrer">CSCV 2025 - Chung Kết Sinh Viên An Ninh Mạng</a></h3>
+            <p class="note-excerpt">Writeup vòng Chung kết CSCV 2025: Web Application (NoSQLi, RCE), Forensics (PowerShell malware, Linux DFIR), DFIR (ransomware AES-256-CBC), Reverse Engineering (APK, mt19937_64).</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CSCV 2025</span><span class="blog-tag-pill">Web</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">DFIR</span><span class="blog-tag-pill">Reverse</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup cscv 2025 sinh vien an ninh mang forensics dns aes bitlocker covert channel tcp" data-date="2025-10-18">
+          <a class="note-cover is-short" style="--cover:#1e3a8a;--cover-ink:#ffffff" href="wu/CSCV_2025_Quals/index.html" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-poster" src="images/ctf/cscv.jpg" alt="" loading="lazy" onerror="this.outerHTML='&lt;span class=&quot;note-cover-mark&quot;&gt;CSCV&lt;/span&gt;'"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-10-18">2025-10-18</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1200 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>6 mins</span></div>
+            <h3 class="note-title"><a href="wu/CSCV_2025_Quals/index.html" target="_blank" rel="noopener noreferrer">CSCV 2025 - Sơ Khảo Sinh Viên An Ninh Mạng [Tham khảo]</a></h3>
+            <p class="note-excerpt">Sưu tầm write-up vòng Sơ khảo CSCV 2025: DNS Exfiltration (AES-CBC qua DNS), NostalgiaS (.NET stealer XOR), Case AlphaS (BitLocker recovery), CovertS (TCP checksum covert channel). Nguồn: m1nhd4cc.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CSCV 2025</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">DNS</span><span class="blog-tag-pill">BitLocker</span><span class="blog-tag-pill">[Tham khảo]</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup ine ctf red teaming vulncorp ai security cloud web 2025" data-date="2025-12-12">
+          <a class="note-cover is-short" style="--cover:#1c1917;--cover-ink:#fb923c" href="https://app.notion.com/p/INE-CTF-8bd5dcdc66b582b5bd1d8110241fe611" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo is-wide is-dark" src="images/ctf/ine.svg" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-12-12">2025-12-12</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>9 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/INE-CTF-8bd5dcdc66b582b5bd1d8110241fe611" target="_blank" rel="noopener noreferrer">INE CTF 2025 - VulnCorp Red Teaming Assessment</a></h3>
+            <p class="note-excerpt">Writeup chi tiết thử thách VulnCorp (Red Teaming): Chuỗi lỗ hổng OWASP 2025, Node.js &amp; Python microservices, Docker, AI/LLM &amp; Cloud-native.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">INE CTF</span><span class="blog-tag-pill">Red Teaming</span><span class="blog-tag-pill">AI Security</span><span class="blog-tag-pill">Cloud</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup scarlet ctf ru sec rev reverse engineering binary 2026" data-date="2026-01-15">
+          <a class="note-cover" style="--cover:#9f1239;--cover-ink:#ffffff" href="https://app.notion.com/p/Scarlet-CTF-2026-f025dcdc66b5822dbfbc018d71fd9f1a" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/scarlet.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-15">2026-01-15</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>7 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/Scarlet-CTF-2026-f025dcdc66b5822dbfbc018d71fd9f1a" target="_blank" rel="noopener noreferrer">Scarlet CTF 2026 - Reversing &amp; Binary Analysis</a></h3>
+            <p class="note-excerpt">Writeup giải các thử thách Reverse Engineering (Rev/first_steps) tại Scarlet CTF 2026 do RU SEC tổ chức (Team: The Crack in the Light - Rank 87).</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">Scarlet CTF</span><span class="blog-tag-pill">RU SEC</span><span class="blog-tag-pill">Rev</span><span class="blog-tag-pill">Binary Analysis</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup knightctf rev reverse engineering e4sy p3asy 2026" data-date="2026-01-20">
+          <a class="note-cover" style="--cover:#334155;--cover-ink:#ffffff" href="https://app.notion.com/p/KnightCTF-2026-6465dcdc66b5827eac9c017a78adc3ce" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/knightctf.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-20">2026-01-20</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>5 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/KnightCTF-2026-6465dcdc66b5827eac9c017a78adc3ce" target="_blank" rel="noopener noreferrer">KnightCTF 2026 - Reverse Engineering (E4sy P3asy)</a></h3>
+            <p class="note-excerpt">Writeup thử thách Reverse Engineering (E4sy P3asy) tại KnightCTF 2026 bởi team Th3 Cr4ck in th3 L1ght (Rank 327 - 800 Points).</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">KnightCTF</span><span class="blog-tag-pill">Rev</span><span class="blog-tag-pill">E4sy P3asy</span><span class="blog-tag-pill">Reverse Engineering</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup vsl ctf rev pwn misc reverse engineering 2026" data-date="2026-01-24">
+          <a class="note-cover is-short" style="--cover:#155e75;--cover-ink:#ffffff" href="https://app.notion.com/p/VSL-CTF-2026-3d95dcdc66b583de98bd8187686da969" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/vsl.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-24">2026-01-24</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>8 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/VSL-CTF-2026-3d95dcdc66b583de98bd8187686da969" target="_blank" rel="noopener noreferrer">VSL CTF 2026 - Reversing, Pwn &amp; Misc Writeups</a></h3>
+            <p class="note-excerpt">Writeup giải các thử thách Reverse Engineering, Binary Exploitation (Pwn) &amp; Misc tại VSL CTF 2026 bởi team SALAD DAYS (49th place - 1991 pts).</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">VSL CTF</span><span class="blog-tag-pill">Rev</span><span class="blog-tag-pill">Pwn</span><span class="blog-tag-pill">Misc</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup 47con ctf gdu_team1 top 8 2026" data-date="2026-04-17">
+          <a class="note-cover" style="--cover:#3f3f46;--cover-ink:#c9ff73" href="https://app.notion.com/p/47CON-CTF-2026-ead5dcdc66b582aab38d81e40853c4f1" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/47con.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-04-17">2026-04-17</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>7 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/47CON-CTF-2026-ead5dcdc66b582aab38d81e40853c4f1" target="_blank" rel="noopener noreferrer">47CON CTF 2026 - Writeup &amp; Full Challenge Archive</a></h3>
+            <p class="note-excerpt">Báo cáo Writeup xuất sắc đạt Top 8 (Rank 8 - 3340 pts - Award Eligible) giải 47CON CTF 2026 bởi team GDU_Team1. Đính kèm bộ đề thi lưu trữ đầy đủ.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">47CON</span><span class="blog-tag-pill">GDU_Team1</span><span class="blog-tag-pill">Full Archive</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup hacktheon sejong pwn rev web ssrf ai security 2026" data-date="2026-03-25">
+          <a class="note-cover is-long" style="--cover:#1d4ed8;--cover-ink:#ffffff" href="https://app.notion.com/p/Hacktheon-Sejong-2026-CTF-70c5dcdc66b5831482eb01720810c876" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo is-wide" src="images/ctf/hacktheon.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-03-25">2026-03-25</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>9 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/Hacktheon-Sejong-2026-CTF-70c5dcdc66b5831482eb01720810c876" target="_blank" rel="noopener noreferrer">Hacktheon Sejong 2026 CTF - Multi-Category Writeups</a></h3>
+            <p class="note-excerpt">Writeup chi tiết các thử thách Web (Redirect SSRF, Auth Bypass), Pwn (Immutable), Reversing (Recover It!), AI Voice Over &amp; Misc tại Hacktheon Sejong 2026.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">Hacktheon Sejong</span><span class="blog-tag-pill">Web</span><span class="blog-tag-pill">SSRF</span><span class="blog-tag-pill">Pwn</span><span class="blog-tag-pill">AI Security</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup trx ctf crypto quantum cipher rsa cryptography 2026" data-date="2026-04-10">
+          <a class="note-cover is-short" style="--cover:#065f46;--cover-ink:#ffffff" href="https://app.notion.com/p/TRX-CTF-2026-4cf5dcdc66b5832084b58119057ddf17" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/trx.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-04-10">2026-04-10</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>7 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/TRX-CTF-2026-4cf5dcdc66b5832084b58119057ddf17" target="_blank" rel="noopener noreferrer">TRX CTF 2026 - Cryptography Writeups</a></h3>
+            <p class="note-excerpt">Phân tích &amp; giải chi tiết chuỗi bài tập Cryptography (HBKG, quantum-cipher, RSSS, quantum-cipher-revenge) tại giải đấu TRX CTF 2026.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">TRX CTF</span><span class="blog-tag-pill">Crypto</span><span class="blog-tag-pill">Quantum Cipher</span><span class="blog-tag-pill">Cryptography</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup bkisc ctf g0ld3n_kn1ght forensics osint web misc 2026" data-date="2026-05-09">
+          <a class="note-cover" style="--cover:#2b3990;--cover-ink:#ffffff" href="https://app.notion.com/p/BKISC-CTF-2026-71c5dcdc66b583d49dfe81371e5d91ba" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/bkisc.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-05-09">2026-05-09</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>8 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/BKISC-CTF-2026-71c5dcdc66b583d49dfe81371e5d91ba" target="_blank" rel="noopener noreferrer">BKISC CTF 2026 - Forensic, OSINT, Web &amp; Misc Writeups</a></h3>
+            <p class="note-excerpt">Writeup giải BKISC CTF 2026 đạt Rank 33/417 đội (1950 pts) bởi team G0ld3n_Kn1ght (GDU): Thử thách Digital Forensics, OSINT, Web &amp; Misc.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">BKISC CTF</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">OSINT</span><span class="blog-tag-pill">Web</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup tjctf g0ld3n_kn1ght crypto forensics rev misc 2026" data-date="2026-05-15">
+          <a class="note-cover" style="--cover:#374151;--cover-ink:#ffffff" href="https://app.notion.com/p/TJCTF-2026-fff5dcdc66b583189fda81652db340fd" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/tjctf.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-05-15">2026-05-15</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>9 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/TJCTF-2026-fff5dcdc66b583189fda81652db340fd" target="_blank" rel="noopener noreferrer">TJCTF 2026 - Crypto, Forensics, Rev &amp; Misc Writeups</a></h3>
+            <p class="note-excerpt">Tổng hợp writeup chuỗi thử thách Crypto, Forensics (7 bài), Reversing &amp; Misc tại TJCTF 2026 bởi team G0ld3n_Kn1ght (Rank 162 - 3552 pts).</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">TJCTF</span><span class="blog-tag-pill">Crypto</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">Rev</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card is-disabled" data-type="writeup" data-tags="ctf writeup hcmus ctf g0ld3n_kn1ght rev forensics crypto 2026" data-date="2026-05-25">
+          <div class="note-cover" style="--cover:#1e3a8a;--cover-ink:#ffffff" aria-hidden="true"><img class="note-cover-logo is-wide" src="images/ctf/hcmus.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></div>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-05-25">2026-05-25</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>8 mins</span></div>
+            <h3 class="note-title">HCMUS-CTF 2026 - Writeup &amp; Challenge Analysis</h3>
+            <p class="note-excerpt">Writeup giải HCMUS-CTF 2026 bởi team G0ld3n_Kn1ght: Đạt 2337 điểm (Rank 35 Talent / Rank 40 Overall), hoàn thành 100% thử thách Rev &amp; Forensics.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="note-soon">Sắp cập nhật</span><span class="blog-tag-pill">HCMUS-CTF</span><span class="blog-tag-pill">Rev</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">Crypto</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup wargame dreamhack forensics steganography zsteg 2026" data-date="2026-06-01">
+          <a class="note-cover is-long" style="--cover:#312e81;--cover-ink:#ffffff" href="https://app.notion.com/p/DreamHack-1fb5dcdc66b582a5994d819a2315d5d2" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/dreamhack.png" alt="" loading="lazy"><span class="note-cover-meta">CTF WRITEUP · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-06-01">2026-06-01</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>5 mins</span></div>
+            <h3 class="note-title"><a href="https://app.notion.com/p/DreamHack-1fb5dcdc66b582a5994d819a2315d5d2" target="_blank" rel="noopener noreferrer">DreamHack Wargame - Digital Forensics Challenges</a></h3>
+            <p class="note-excerpt">Writeup các thử thách Digital Forensics &amp; Steganography trên DreamHack: Kỹ thuật phân tích LSB, zsteg, metadata extraction và khôi phục flag.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">DreamHack</span><span class="blog-tag-pill">Wargame</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">Steganography</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="press" data-tags="báo chí truyền thông htv doanh nhân sài gòn lương văn can giải thưởng 2026" data-date="2026-03-26">
+          <a class="note-cover is-short" style="--cover:#1d4f91;--cover-ink:#ffffff" href="https://htv.vn/doanhnhansaigon/50-thi-sinh-vao-vong-chung-ket-giai-thuong-luong-van-can-lan-thu-12-334962.html" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo is-wide" src="images/ctf/doanhnhansaigon.png" alt="" loading="lazy"><span class="note-cover-meta">PRESS · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-03-26">2026-03-26</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-source"/></svg>Tạp chí Doanh Nhân Sài Gòn / HTV</span></div>
+            <h3 class="note-title"><a href="https://htv.vn/doanhnhansaigon/50-thi-sinh-vao-vong-chung-ket-giai-thuong-luong-van-can-lan-thu-12-334962.html" target="_blank" rel="noopener noreferrer">HTV &amp; Doanh Nhân Sài Gòn: 50 thí sinh vào vòng chung kết Giải thưởng Lương Văn Can lần thứ 12</a></h3>
+            <p class="note-excerpt">Đài Truyền hình TP.HCM (HTV) và Tạp chí Doanh Nhân Sài Gòn đưa tin công bố danh sách 50 sinh viên xuất sắc nhất bước vào vòng chung kết Giải thưởng Tài năng Lương Văn Can lần thứ 12.</p>
+            <div class="note-foot"><span class="note-category">Báo chí &amp; Đưa tin</span><span class="blog-tag-pill">Báo chí</span><span class="blog-tag-pill">HTV</span><span class="blog-tag-pill">Doanh Nhân Sài Gòn</span><span class="blog-tag-pill">Lương Văn Can</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="press" data-tags="báo chí truyền thông gdu khoa cntt digital trust finance deepfake ai an ninh mạng 2026" data-date="2026-05-14">
+          <a class="note-cover is-short" style="--cover:#14532d;--cover-ink:#ffffff" href="https://www.facebook.com/share/p/1EiHJZG15W/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/gdu.png" alt="" loading="lazy"><span class="note-cover-meta">PRESS · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-05-14">2026-05-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-source"/></svg>GDU - Khoa Công Nghệ Thông Tin</span></div>
+            <h3 class="note-title"><a href="https://www.facebook.com/share/p/1EiHJZG15W/" target="_blank" rel="noopener noreferrer">GDU Khoa CNTT: Diễn đàn "Digital Trust in Finance 2026" - An ninh mạng &amp; Deepfake AI trong Tài chính</a></h3>
+            <p class="note-excerpt">Trước thềm Diễn đàn "Digital Trust in Finance 2026" (12/05/2026) có Bộ Công an, Ngân hàng Nhà nước và Bộ Tài chính tham dự, sinh viên Khoa CNTT - GDU được tiếp cận trực tiếp các vấn đề Deepfake AI, bảo mật dữ liệu và an ninh tài chính số qua talkshow chuyên đề.</p>
+            <div class="note-foot"><span class="note-category">Báo chí &amp; Đưa tin</span><span class="blog-tag-pill">Báo chí</span><span class="blog-tag-pill">GDU</span><span class="blog-tag-pill">Khoa CNTT</span><span class="blog-tag-pill">Digital Trust</span><span class="blog-tag-pill">Deepfake AI</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="press" data-tags="báo chí truyền thông gdu khoa cntt đào tạo thực chiến an ninh mạng 2026" data-date="2026-04-08">
+          <a class="note-cover is-short" style="--cover:#14532d;--cover-ink:#ffffff" href="https://www.facebook.com/share/p/19Khaooo5A/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/gdu.png" alt="" loading="lazy"><span class="note-cover-meta">PRESS · 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-04-08">2026-04-08</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-source"/></svg>GDU - Khoa Công Nghệ Thông Tin</span></div>
+            <h3 class="note-title"><a href="https://www.facebook.com/share/p/19Khaooo5A/" target="_blank" rel="noopener noreferrer">GDU Khoa CNTT: Môi trường đào tạo thực chiến - Sinh viên "chạm tay" vào hệ thống thực tế &amp; An ninh mạng</a></h3>
+            <p class="note-excerpt">Khoa CNTT - Trường Đại học Gia Định giới thiệu mô hình học qua dự án thật: sinh viên khảo sát hệ thống mạng tại trường THPT Việt Nhật, phân tích vấn đề thực tế và đề xuất giải pháp cải thiện hạ tầng mạng cho nhiều người dùng.</p>
+            <div class="note-foot"><span class="note-category">Báo chí &amp; Đưa tin</span><span class="blog-tag-pill">Báo chí</span><span class="blog-tag-pill">GDU</span><span class="blog-tag-pill">Khoa CNTT</span><span class="blog-tag-pill">Đào tạo thực chiến</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="press" data-tags="báo chí truyền thông gdu khoa cntt diễn tập thực chiến an toàn thông tin 2025" data-date="2025-12-24">
+          <a class="note-cover is-short" style="--cover:#14532d;--cover-ink:#ffffff" href="https://www.facebook.com/share/p/19D69uhhef/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/gdu.png" alt="" loading="lazy"><span class="note-cover-meta">PRESS · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-12-24">2025-12-24</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-source"/></svg>GDU - Khoa Công Nghệ Thông Tin</span></div>
+            <h3 class="note-title"><a href="https://www.facebook.com/share/p/19D69uhhef/" target="_blank" rel="noopener noreferrer">GDU Khoa CNTT: Tham gia Diễn tập thực chiến Bảo đảm An toàn thông tin mạng 2025</a></h3>
+            <p class="note-excerpt">Khoa CNTT - Trường Đại học Gia Định nhận lời mời tham gia Diễn tập thực chiến bảo đảm an toàn thông tin mạng năm 2025 do Sở Khoa học và Công nghệ tỉnh Tây Ninh tổ chức (23–24/12/2025), diễn tập trên hệ thống thật, không kịch bản sẵn.</p>
+            <div class="note-foot"><span class="note-category">Báo chí &amp; Đưa tin</span><span class="blog-tag-pill">Báo chí</span><span class="blog-tag-pill">GDU</span><span class="blog-tag-pill">Khoa CNTT</span><span class="blog-tag-pill">Diễn tập thực chiến</span><span class="blog-tag-pill">An toàn thông tin</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="press" data-tags="báo chí truyền thông gdu khoa cntt rmit hackathon 2025 clb mạng attt" data-date="2025-12-03">
+          <a class="note-cover is-short" style="--cover:#14532d;--cover-ink:#ffffff" href="https://www.facebook.com/share/p/19HGS6uFog/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/gdu.png" alt="" loading="lazy"><span class="note-cover-meta">PRESS · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-12-03">2025-12-03</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-source"/></svg>GDU - Khoa Công Nghệ Thông Tin</span></div>
+            <h3 class="note-title"><a href="https://www.facebook.com/share/p/19HGS6uFog/" target="_blank" rel="noopener noreferrer">GDU Khoa CNTT: Vinh danh thành viên CLB Mạng &amp; An toàn thông tin tại RMIT Hackathon 2025</a></h3>
+            <p class="note-excerpt">Khoa CNTT - Trường Đại học Gia Định vinh danh các thành viên CLB Mạng &amp; An toàn thông tin (trong đó có Lê Thanh Hải) đã đại diện GDU tham gia RMIT Hackathon 2025 và được RMIT University trao Certificate of Participation.</p>
+            <div class="note-foot"><span class="note-category">Báo chí &amp; Đưa tin</span><span class="blog-tag-pill">Báo chí</span><span class="blog-tag-pill">GDU</span><span class="blog-tag-pill">Khoa CNTT</span><span class="blog-tag-pill">RMIT Hackathon</span><span class="blog-tag-pill">CLB Mạng &amp; ATTT</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="press" data-tags="báo chí truyền thông gdu khoa cntt rmit hackathon 2025 nhật ký hackathon" data-date="2025-11-18">
+          <a class="note-cover is-short" style="--cover:#14532d;--cover-ink:#ffffff" href="https://www.facebook.com/share/p/18bxRAqaap/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/gdu.png" alt="" loading="lazy"><span class="note-cover-meta">PRESS · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-11-18">2025-11-18</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-source"/></svg>GDU - Khoa Công Nghệ Thông Tin</span></div>
+            <h3 class="note-title"><a href="https://www.facebook.com/share/p/18bxRAqaap/" target="_blank" rel="noopener noreferrer">Nhật ký GDU tại RMIT Hackathon 2025: Code mỏi tay – Vui hết nấc</a></h3>
+            <p class="note-excerpt">"2 ngày hackathon, 1001 cảm xúc!" – Bài đăng ghi lại hành trình của 4 đội tuyển GDU CTF tại RMIT Hackathon 2025: GenAI &amp; Cyber Security, sân chơi quy tụ các đội thi từ Melbourne, Hà Nội đến TP.HCM.</p>
+            <div class="note-foot"><span class="note-category">Báo chí &amp; Đưa tin</span><span class="blog-tag-pill">Báo chí</span><span class="blog-tag-pill">GDU</span><span class="blog-tag-pill">Khoa CNTT</span><span class="blog-tag-pill">RMIT Hackathon</span><span class="blog-tag-pill">Nhật ký Hackathon</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="press" data-tags="báo chí truyền thông gdu khoa cntt cybersecurity student contest 2025 sinh viên attt" data-date="2025-11-16">
+          <a class="note-cover is-short" style="--cover:#14532d;--cover-ink:#ffffff" href="https://www.facebook.com/share/p/1Ca9HTUfTm/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/gdu.png" alt="" loading="lazy"><span class="note-cover-meta">PRESS · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-11-16">2025-11-16</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-source"/></svg>GDU - Khoa Công Nghệ Thông Tin</span></div>
+            <h3 class="note-title"><a href="https://www.facebook.com/share/p/1Ca9HTUfTm/" target="_blank" rel="noopener noreferrer">GDU Khoa CNTT: Bùng nổ tại Cybersecurity Student Contest Vietnam 2025</a></h3>
+            <p class="note-excerpt">Ngày 15/11/2025, đội tuyển CTF - An toàn thông tin của Khoa CNTT GDU lọt TOP 23/51 đội tại vòng Chung khảo cuộc thi Sinh viên An ninh mạng 2025 (CSCV) do NCA tổ chức, dưới sự bảo trợ của Bộ Công an và Bộ GD&amp;ĐT.</p>
+            <div class="note-foot"><span class="note-category">Báo chí &amp; Đưa tin</span><span class="blog-tag-pill">Báo chí</span><span class="blog-tag-pill">GDU</span><span class="blog-tag-pill">Khoa CNTT</span><span class="blog-tag-pill">Sinh viên ATTT</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+
+        <article class="note-card" data-type="press" data-tags="báo chí truyền thông gdu khoa cntt clb mạng &amp; attt rmit hackathon 2025 genai cyber security" data-date="2025-10-22">
+          <a class="note-cover is-short" style="--cover:#14532d;--cover-ink:#ffffff" href="https://www.facebook.com/share/r/19ES3N8ET2/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-logo" src="images/ctf/gdu.png" alt="" loading="lazy"><span class="note-cover-meta">PRESS · 2025</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2025-10-22">2025-10-22</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-source"/></svg>GDU Network &amp; Cybersecurity Club</span></div>
+            <h3 class="note-title"><a href="https://www.facebook.com/share/r/19ES3N8ET2/" target="_blank" rel="noopener noreferrer">Sinh viên GDU tại RMIT Hackathon 2025 – GenAI &amp; Cyber Security!</a></h3>
+            <p class="note-excerpt">Video Reel từ GDU Network &amp; Cybersecurity Club ghi lại hoạt động của 4 đội tuyển GDU (B4ttle3On, K@M40iS4u, G01d3n Kn1ght, Unicorn-Defender) tại RMIT Hackathon 2025: GenAI &amp; Cyber Security.</p>
+            <div class="note-foot"><span class="note-category">Báo chí &amp; Đưa tin</span><span class="blog-tag-pill">Báo chí</span><span class="blog-tag-pill">GDU</span><span class="blog-tag-pill">Khoa CNTT</span><span class="blog-tag-pill">CLB Mạng &amp; ATTT</span><span class="blog-tag-pill">RMIT Hackathon</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="journal-empty" id="noResults" hidden>
+        <span aria-hidden="true">∅</span>
+        <h3>Không tìm thấy vật chứng nào.</h3>
+        <p>Thử từ khóa khác, hoặc xóa bộ lọc để xem toàn bộ thư viện.</p>
+        <button type="button" id="resetFilters">Xóa bộ lọc <span aria-hidden="true">↺</span></button>
+      </div>
+
+      <div class="journal-library-end">
+        <span aria-hidden="true">✳</span>
+        <p>Còn nhiều điều để học.<br>Ghi chép tiếp theo đang được viết.</p>
+        <a href="index.html#contact" data-transition-label="Let's connect.">Gợi ý chủ đề cho mình <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="journal-footer">
+    <a class="brand" href="index.html" data-transition-label="Portfolio.">th4nhh4i<span>.</span></a>
+    <p>© 2026 LÊ THANH HẢI · FIELD NOTES</p>
+    <button id="motion-toggle" class="motion-toggle mono" type="button" aria-pressed="true">Hiệu ứng <span data-motion-state>ON</span> <span class="motion-indicator"></span></button>
+    <a href="#main">Lên đầu trang <span aria-hidden="true">↑</span></a>
+  </footer>
+</body>
+</html>

