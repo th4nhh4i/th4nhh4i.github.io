@@ -216,7 +216,7 @@
 }
 
 .roadmap-canvas {
-  width: 12160px;
+  width: 13440px;
   height: 100%;
   position: relative;
   transform-origin: 0 50%;
@@ -227,7 +227,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 12160px;
+  width: 13440px;
   height: 100%;
   pointer-events: none;
   z-index: 1;
@@ -246,7 +246,7 @@
 .road-nodes-container {
   position: relative;
   z-index: 2;
-  width: 12160px;
+  width: 13440px;
   height: 100%;
 }
 

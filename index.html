@@ -17,9 +17,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="portfolio.css">
   <link rel="stylesheet" href="evidence.css?v=12">
-  <link rel="stylesheet" href="roadmap.css?v=4">
-  <link rel="stylesheet" href="appearance.css?v=1">
-  <script src="appearance.js?v=1"></script>
+  <link rel="stylesheet" href="roadmap.css?v=5">
+  <link rel="stylesheet" href="appearance.css?v=4">
+  <script src="appearance.js?v=3"></script>
   <script>
     /* Chạy sớm: bật reveal và phủ màn nếu vừa chuyển trang; tự gỡ nếu app.js không tải được. */
     (function () {
@@ -35,7 +35,7 @@
       setTimeout(function () { if (!window.th4nhh4iReady) root.classList.remove('js', 'is-arriving'); }, 3000);
     })();
   </script>
-  <script src="app.js?v=6" defer></script>
+  <script src="app.js?v=7" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Đến nội dung chính</a>
@@ -136,11 +136,11 @@
 
     <!-- ===== 02 PROJECTS ===== -->
     <section id="projects" class="section-shell section-space projects-section">
-      <div class="section-heading reveal"><p class="eyebrow"><span class="section-index">02 /</span> <span data-scramble>SELECTED WORK</span></p><a class="text-link" href="https://github.com/thanhhai2103" target="_blank" rel="noopener noreferrer">GitHub của mình <span>↗</span></a></div>
+      <div class="section-heading reveal"><p class="eyebrow"><span class="section-index">02 /</span> <span data-scramble>SELECTED WORK</span></p><a class="text-link" href="https://github.com/th4nhh4i" target="_blank" rel="noopener noreferrer">GitHub của mình <span>↗</span></a></div>
       <div class="section-title-row reveal"><h2>Thực hành. Phân tích.<br><span class="serif-word">Không ngừng thử.</span></h2><p>Một vài dự án và bài lab tiêu biểu.<br>Từ mô phỏng tấn công đến phòng thủ thực tế.</p></div>
       <article class="featured-project reveal">
         <div class="project-art nginx-art" aria-label="Sơ đồ bảo vệ hệ thống qua NGINX WAF"><div class="art-topline mono"><span>ARCHITECTURE / 001</span><span>↗</span></div><div class="network-map"><span class="network-label label-client">INCOMING TRAFFIC</span><div class="network-sources"><span>↗</span><span>↗</span><span>↗</span></div><div class="network-path path-top"></div><div class="waf-node"><span class="waf-icon">N</span><span>NGINX <b>SECURITY GATEWAY</b></span><span class="status-dot"></span></div><div class="network-path path-bottom"></div><div class="server-nodes"><span>WAF</span><span>RATE LIMIT</span><span>FAIL2BAN</span></div><span class="network-label label-secure"><span class="status-dot"></span> DEFENSE IN DEPTH</span></div><span class="art-caption mono">REQUEST → INSPECT → PROTECT</span></div>
-        <div class="project-body"><div class="project-kicker mono"><span class="lime-text">01 / RESEARCH PROJECT</span><span>01 — 09 / 2025</span></div><h3>Reverse Proxy<br>Security System.</h3><p>Đề tài nghiên cứu khoa học: hệ thống Reverse Proxy đa tầng với NGINX — kết hợp Load Balancing, Rate Limiting, Fail2Ban và ModSecurity WAF để ứng phó DDoS, brute-force và lỗ hổng ứng dụng web.</p><div class="tags"><span>NGINX</span><span>ModSecurity</span><span>Fail2Ban</span><span>Docker</span><span>Linux Hardening</span></div><div class="project-bottom"><span class="mono muted">VAI TRÒ / CHỦ NHIỆM ĐỀ TÀI</span><a href="https://github.com/thanhhai2103" target="_blank" rel="noopener noreferrer" class="circle-link" aria-label="Xem mã nguồn dự án trên GitHub">↗</a></div></div>
+        <div class="project-body"><div class="project-kicker mono"><span class="lime-text">01 / RESEARCH PROJECT</span><span>01 — 09 / 2025</span></div><h3>Reverse Proxy<br>Security System.</h3><p>Đề tài nghiên cứu khoa học: hệ thống Reverse Proxy đa tầng với NGINX — kết hợp Load Balancing, Rate Limiting, Fail2Ban và ModSecurity WAF để ứng phó DDoS, brute-force và lỗ hổng ứng dụng web.</p><div class="tags"><span>NGINX</span><span>ModSecurity</span><span>Fail2Ban</span><span>Docker</span><span>Linux Hardening</span></div><div class="project-bottom"><span class="mono muted">VAI TRÒ / CHỦ NHIỆM ĐỀ TÀI</span><a href="https://github.com/th4nhh4i/nginx-reverse-proxy-waf" target="_blank" rel="noopener noreferrer" class="circle-link" aria-label="Xem mã nguồn dự án trên GitHub">↗</a></div></div>
       </article>
       <div class="project-pair">
         <article class="small-project reveal"><a class="project-art lab-art" href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam" target="_blank" rel="noopener noreferrer" aria-label="Xem bộ bài lab Purple Team trên GitHub"><div class="art-topline mono"><span>ATTACK × DETECT × RESPOND</span><span>↗</span></div><div class="lab-visual"><div class="lab-circle red-circle">RED<br><small>SIMULATE</small></div><div class="lab-circle blue-circle">BLUE<br><small>DEFEND</small></div><div class="lab-center">✳</div></div><span class="art-caption mono">TWO PERSPECTIVES. ONE STRONGER DEFENSE.</span></a><div class="small-project-body"><div class="project-kicker mono">02 / SECURITY LABS</div><h3>Purple Team in action.</h3><p>7 kịch bản thực hành: leo thang đặc quyền, insider threat, brute force, reverse shell, ransomware qua phishing — phát hiện bằng Sysmon & Wazuh.</p><div class="tags"><span>Wazuh</span><span>Sysmon</span><span>Incident Response</span><span>Blue Team</span></div></div></article>
@@ -229,7 +229,7 @@
         <div class="roadmap-viewport" id="roadmapViewport">
           <div class="roadmap-canvas" id="roadmapCanvas">
             <!-- Winding Road SVG Track (Bề rộng mở rộng 8400px) -->
-            <svg class="winding-road-svg" viewBox="0 0 10640 700" preserveAspectRatio="none">
+            <svg class="winding-road-svg" viewBox="0 0 13440 700" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="cyberAsphaltGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stop-color="#f43f5e" />
@@ -245,18 +245,18 @@
   
               <!-- Outer Neon Glowing Border Edge -->
               <path
-                d="M 0 350 C 160 100, 320 600, 480 350 C 640 100, 800 600, 960 350 C 1120 100, 1280 600, 1440 350 C 1600 100, 1760 600, 1920 350 C 2080 100, 2240 600, 2400 350 C 2560 100, 2720 600, 2880 350 C 3040 100, 3200 600, 3360 350 C 3520 100, 3680 600, 3840 350 C 4000 100, 4160 600, 4320 350 C 4480 100, 4640 600, 4800 350 C 4960 100, 5120 600, 5280 350 C 5440 100, 5600 600, 5760 350 C 5920 100, 6080 600, 6240 350 C 6400 100, 6560 600, 6720 350 C 6880 100, 7040 600, 7200 350 C 7360 100, 7520 600, 7680 350 C 7840 100, 8000 600, 8160 350 C 8320 100, 8480 600, 8640 350 C 8800 100, 8960 600, 9120 350 C 9280 100, 9440 600, 9600 350 C 9760 100, 9920 600, 10080 350 C 10240 100, 10400 600, 10560 350 C 10720 100, 10880 600, 11040 350 C 11200 100, 11360 600, 11520 350 C 11680 100, 11840 600, 12000 350 C 12160 100, 12320 600, 12480 350"
+                d="M 0 350 C 160 100, 320 600, 480 350 C 640 100, 800 600, 960 350 C 1120 100, 1280 600, 1440 350 C 1600 100, 1760 600, 1920 350 C 2080 100, 2240 600, 2400 350 C 2560 100, 2720 600, 2880 350 C 3040 100, 3200 600, 3360 350 C 3520 100, 3680 600, 3840 350 C 4000 100, 4160 600, 4320 350 C 4480 100, 4640 600, 4800 350 C 4960 100, 5120 600, 5280 350 C 5440 100, 5600 600, 5760 350 C 5920 100, 6080 600, 6240 350 C 6400 100, 6560 600, 6720 350 C 6880 100, 7040 600, 7200 350 C 7360 100, 7520 600, 7680 350 C 7840 100, 8000 600, 8160 350 C 8320 100, 8480 600, 8640 350 C 8800 100, 8960 600, 9120 350 C 9280 100, 9440 600, 9600 350 C 9760 100, 9920 600, 10080 350 C 10240 100, 10400 600, 10560 350 C 10720 100, 10880 600, 11040 350 C 11200 100, 11360 600, 11520 350 C 11680 100, 11840 600, 12000 350 C 12160 100, 12320 600, 12480 350 C 12640 100, 12800 600, 12960 350 C 13120 100, 13280 600, 13440 350"
                 fill="none" stroke="url(#cyberAsphaltGrad)" stroke-width="28" stroke-linecap="round"
                 filter="url(#roadGlowGlow)" opacity="0.5" />
   
               <!-- Main Dark Road Track -->
               <path
-                d="M 0 350 C 160 100, 320 600, 480 350 C 640 100, 800 600, 960 350 C 1120 100, 1280 600, 1440 350 C 1600 100, 1760 600, 1920 350 C 2080 100, 2240 600, 2400 350 C 2560 100, 2720 600, 2880 350 C 3040 100, 3200 600, 3360 350 C 3520 100, 3680 600, 3840 350 C 4000 100, 4160 600, 4320 350 C 4480 100, 4640 600, 4800 350 C 4960 100, 5120 600, 5280 350 C 5440 100, 5600 600, 5760 350 C 5920 100, 6080 600, 6240 350 C 6400 100, 6560 600, 6720 350 C 6880 100, 7040 600, 7200 350 C 7360 100, 7520 600, 7680 350 C 7840 100, 8000 600, 8160 350 C 8320 100, 8480 600, 8640 350 C 8800 100, 8960 600, 9120 350 C 9280 100, 9440 600, 9600 350 C 9760 100, 9920 600, 10080 350 C 10240 100, 10400 600, 10560 350 C 10720 100, 10880 600, 11040 350 C 11200 100, 11360 600, 11520 350 C 11680 100, 11840 600, 12000 350 C 12160 100, 12320 600, 12480 350"
+                d="M 0 350 C 160 100, 320 600, 480 350 C 640 100, 800 600, 960 350 C 1120 100, 1280 600, 1440 350 C 1600 100, 1760 600, 1920 350 C 2080 100, 2240 600, 2400 350 C 2560 100, 2720 600, 2880 350 C 3040 100, 3200 600, 3360 350 C 3520 100, 3680 600, 3840 350 C 4000 100, 4160 600, 4320 350 C 4480 100, 4640 600, 4800 350 C 4960 100, 5120 600, 5280 350 C 5440 100, 5600 600, 5760 350 C 5920 100, 6080 600, 6240 350 C 6400 100, 6560 600, 6720 350 C 6880 100, 7040 600, 7200 350 C 7360 100, 7520 600, 7680 350 C 7840 100, 8000 600, 8160 350 C 8320 100, 8480 600, 8640 350 C 8800 100, 8960 600, 9120 350 C 9280 100, 9440 600, 9600 350 C 9760 100, 9920 600, 10080 350 C 10240 100, 10400 600, 10560 350 C 10720 100, 10880 600, 11040 350 C 11200 100, 11360 600, 11520 350 C 11680 100, 11840 600, 12000 350 C 12160 100, 12320 600, 12480 350 C 12640 100, 12800 600, 12960 350 C 13120 100, 13280 600, 13440 350"
                 fill="none" stroke="#070c1e" stroke-width="20" stroke-linecap="round" />
   
               <!-- Animated White/Neon Dashed Center Line -->
               <path
-                d="M 0 350 C 160 100, 320 600, 480 350 C 640 100, 800 600, 960 350 C 1120 100, 1280 600, 1440 350 C 1600 100, 1760 600, 1920 350 C 2080 100, 2240 600, 2400 350 C 2560 100, 2720 600, 2880 350 C 3040 100, 3200 600, 3360 350 C 3520 100, 3680 600, 3840 350 C 4000 100, 4160 600, 4320 350 C 4480 100, 4640 600, 4800 350 C 4960 100, 5120 600, 5280 350 C 5440 100, 5600 600, 5760 350 C 5920 100, 6080 600, 6240 350 C 6400 100, 6560 600, 6720 350 C 6880 100, 7040 600, 7200 350 C 7360 100, 7520 600, 7680 350 C 7840 100, 8000 600, 8160 350 C 8320 100, 8480 600, 8640 350 C 8800 100, 8960 600, 9120 350 C 9280 100, 9440 600, 9600 350 C 9760 100, 9920 600, 10080 350 C 10240 100, 10400 600, 10560 350 C 10720 100, 10880 600, 11040 350 C 11200 100, 11360 600, 11520 350 C 11680 100, 11840 600, 12000 350 C 12160 100, 12320 600, 12480 350"
+                d="M 0 350 C 160 100, 320 600, 480 350 C 640 100, 800 600, 960 350 C 1120 100, 1280 600, 1440 350 C 1600 100, 1760 600, 1920 350 C 2080 100, 2240 600, 2400 350 C 2560 100, 2720 600, 2880 350 C 3040 100, 3200 600, 3360 350 C 3520 100, 3680 600, 3840 350 C 4000 100, 4160 600, 4320 350 C 4480 100, 4640 600, 4800 350 C 4960 100, 5120 600, 5280 350 C 5440 100, 5600 600, 5760 350 C 5920 100, 6080 600, 6240 350 C 6400 100, 6560 600, 6720 350 C 6880 100, 7040 600, 7200 350 C 7360 100, 7520 600, 7680 350 C 7840 100, 8000 600, 8160 350 C 8320 100, 8480 600, 8640 350 C 8800 100, 8960 600, 9120 350 C 9280 100, 9440 600, 9600 350 C 9760 100, 9920 600, 10080 350 C 10240 100, 10400 600, 10560 350 C 10720 100, 10880 600, 11040 350 C 11200 100, 11360 600, 11520 350 C 11680 100, 11840 600, 12000 350 C 12160 100, 12320 600, 12480 350 C 12640 100, 12800 600, 12960 350 C 13120 100, 13280 600, 13440 350"
                 fill="none" stroke="#00ffcc" stroke-width="4" stroke-dasharray="16 12" class="road-center-anim" />
             </svg>
   
@@ -898,8 +898,24 @@
                 </div>
               </div>
 
+              <!-- 39: 09/09/2026 -->
+              <div class="road-node-item pos-top" style="left: 12400px;">
+                <div class="node-circle green-node">
+                  <i class="fas fa-campground"></i>
+                  <span class="node-step-badge">39</span>
+                </div>
+                <div class="node-card card-top">
+                  <div class="card-tag-row">
+                    <span class="node-date green-tag"><i class="far fa-calendar-alt"></i> 09/09/2026</span>
+                    <span class="type-tag ctf-tag"><i class="fas fa-flag"></i> CTF COMPETITION</span>
+                  </div>
+                  <h4>Security Bootcamp Đắk Lắk 2026</h4>
+                  <p>Can You Remember 1 &amp; 2: phân tích 15 họ malware, dựng đồ thị 20 host, active learning — đạt 100/100 sanity check.</p>
+                </div>
+              </div>
+
               <!-- FUTURE ENDLESS ROAD EXTENSION -->
-              <div class="road-future-end" style="left: 12400px;">
+              <div class="road-future-end" style="left: 12720px;">
                 <div class="future-glowing-sign">
                   <i class="fas fa-compass fa-spin"></i>
                   <span>NEXT HORIZON... SOC ANALYST / PURPLE TEAM SPECIALIST</span>
@@ -922,7 +938,7 @@
         <button type="button" class="gallery-item reveal" data-image="images/5.jpg" data-caption="Trao giải sinh viên xuất sắc — Đại học Gia Định"><img src="images/5.jpg" alt="Trao giải sinh viên xuất sắc tại Đại học Gia Định" loading="lazy" width="500" height="350"><span><small>03 / MILESTONE</small>Make it count.<i>↗</i></span></button>
       </div>
       <details class="all-milestones gallery-more reveal">
-        <summary>Xem thêm ảnh & chứng chỉ <span class="mono">GALLERY · 09 <span>+</span></span></summary>
+        <summary>Xem thêm ảnh & chứng chỉ <span class="mono">GALLERY · 13 <span>+</span></span></summary>
         <div class="certificate-grid">
           <button type="button" class="certificate" data-image="images/1.jpg" data-caption="Bằng khen CTF"><img src="images/1.jpg" alt="Bằng khen CTF" loading="lazy"><span>Bằng khen CTF</span></button>
           <button type="button" class="certificate" data-image="images/3.jpg" data-caption="Chứng nhận cuộc thi"><img src="images/3.jpg" alt="Chứng nhận cuộc thi" loading="lazy"><span>Chứng nhận cuộc thi</span></button>
@@ -933,6 +949,10 @@
           <button type="button" class="certificate" data-image="images/anh1.jpg" data-caption="RMIT Hackathon 2025"><img src="images/anh1.jpg" alt="Hình ảnh RMIT Hackathon 2025" loading="lazy"><span>RMIT Hackathon 2025</span></button>
           <button type="button" class="certificate" data-image="images/anh2.jpg" data-caption="RMIT Hackathon 2025 — đồng đội"><img src="images/anh2.jpg" alt="Đồng đội tại RMIT Hackathon 2025" loading="lazy"><span>Đồng đội tại Hackathon</span></button>
           <button type="button" class="certificate" data-image="images/Proud_to_be_GDUer.jpg" data-caption="Proud to be GDUer"><img src="images/Proud_to_be_GDUer.jpg" alt="Proud to be GDUer" loading="lazy"><span>Proud to be GDUer</span></button>
+          <button type="button" class="certificate" data-image="images/ctf/security-bootcamp-dak-lak-2026/bc1.jpg" data-caption="Security Bootcamp Đắk Lắk 2026 — Đồng đội"><img src="images/ctf/security-bootcamp-dak-lak-2026/bc1.jpg" alt="Đồng đội tại Security Bootcamp Đắk Lắk 2026" loading="lazy"><span>Security Bootcamp 2026</span></button>
+          <button type="button" class="certificate" data-image="images/ctf/security-bootcamp-dak-lak-2026/bc5.jpg" data-caption="Security Bootcamp 2026 — Thi đấu CTF"><img src="images/ctf/security-bootcamp-dak-lak-2026/bc5.jpg" alt="Thi đấu CTF tại Security Bootcamp 2026" loading="lazy"><span>Thi đấu Bootcamp CTF</span></button>
+          <button type="button" class="certificate" data-image="images/ctf/security-bootcamp-dak-lak-2026/bc7.jpg" data-caption="Security Bootcamp 2026 — FINAL SCORE 100/100"><img src="images/ctf/security-bootcamp-dak-lak-2026/bc7.jpg" alt="Kết quả FINAL SCORE 1.0 với cả hai flag" loading="lazy"><span>Final Score 100/100</span></button>
+          <button type="button" class="certificate" data-image="images/ctf/security-bootcamp-dak-lak-2026/bc9.jpg" data-caption="Security Bootcamp 2026 — Scoreboard Can You Remember"><img src="images/ctf/security-bootcamp-dak-lak-2026/bc9.jpg" alt="Scoreboard Can You Remember 1 & 2 — 5000 pts" loading="lazy"><span>Scoreboard 5000 pts</span></button>
         </div>
       </details>
     </section>
@@ -941,7 +961,7 @@
     <section id="contact" class="section-shell contact-section">
       <div class="contact-top reveal"><span class="eyebrow"><span class="status-dot"></span> GOOD CONVERSATIONS START HERE</span><span class="mono muted">LET'S CONNECT / ↙</span></div>
       <div class="contact-main reveal"><div><h2>Cùng xây dựng<br>điều <span class="serif-word">an toàn hơn.</span></h2><p>Một cơ hội hợp tác, một bài CTF thú vị,<br>hay chỉ đơn giản là lời chào. Mình luôn sẵn lòng kết nối.</p></div><a class="contact-orb" href="mailto:thanhhai.dakha@gmail.com" aria-label="Gửi email cho Lê Thanh Hải">↗</a></div>
-      <div class="contact-bottom reveal"><div class="email-group"><a href="mailto:thanhhai.dakha@gmail.com" class="email-link">thanhhai.dakha@gmail.com</a><button id="copy-email" type="button" data-email="thanhhai.dakha@gmail.com" aria-label="Sao chép địa chỉ email" title="Sao chép email">⧉</button><span id="copy-status" role="status" class="copy-status"></span></div><div class="social-links"><a href="https://github.com/thanhhai2103" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://www.facebook.com/thanh.hai.97451" target="_blank" rel="noopener noreferrer">Facebook ↗</a><span class="social-handle">Discord · Th4nhH4i</span></div></div>
+      <div class="contact-bottom reveal"><div class="email-group"><a href="mailto:thanhhai.dakha@gmail.com" class="email-link">thanhhai.dakha@gmail.com</a><button id="copy-email" type="button" data-email="thanhhai.dakha@gmail.com" aria-label="Sao chép địa chỉ email" title="Sao chép email">⧉</button><span id="copy-status" role="status" class="copy-status"></span></div><div class="social-links"><a href="https://github.com/th4nhh4i" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://www.facebook.com/thanh.hai.97451" target="_blank" rel="noopener noreferrer">Facebook ↗</a><span class="social-handle">Discord · Th4nhH4i</span></div></div>
     </section>
   </main>
 
@@ -949,5 +969,11 @@
 
   <dialog id="terminal-dialog" class="terminal-dialog" aria-labelledby="terminal-title"><div class="terminal-heading"><div class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></div><h2 id="terminal-title">visitor@th4nhh4i: ~/evidence</h2><button class="terminal-close" type="button" aria-label="Đóng terminal">×</button></div><div id="terminal-output" class="terminal-output" role="log" aria-live="polite"><p class="lime-text">Welcome to the evidence room.</p><p>Gõ <strong>help</strong> để xem lệnh. Thử <strong>strings evidence.bin</strong> hoặc <strong>ledger</strong>.</p></div><form id="terminal-form" class="terminal-form"><label for="terminal-input"><span class="lime-text">visitor</span><span class="muted">@th4nhh4i</span> ~ $</label><input id="terminal-input" name="command" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Nhập lệnh terminal" placeholder="help"><button type="submit" aria-label="Chạy lệnh">↵</button></form><div class="terminal-foot mono">TAB ĐỂ GỢI Ý · ↑ / ↓ LỊCH SỬ · A LOT OF CURIOSITY.</div></dialog>
   <dialog id="gallery-dialog" class="gallery-dialog" aria-labelledby="gallery-caption"><button class="gallery-close" type="button" aria-label="Đóng ảnh">×</button><img id="gallery-image" alt=""><p id="gallery-caption"></p></dialog>
+
+  <a class="blog-launcher" href="blog.html" aria-label="Xem Field Notes — 39 bài viết và write-up CTF">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H16l4 4v13a1 1 0 0 1-1 1H5.5A1.5 1.5 0 0 1 4 19.5z"/><path d="M15.5 3v4.5H20"/><path d="M8 12h8M8 16h5"/></svg>
+    <span class="blog-launcher-label">Field Notes</span>
+    <span class="blog-launcher-count">39</span>
+  </a>
 </body>
 </html>

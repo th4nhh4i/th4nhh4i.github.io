@@ -344,7 +344,16 @@
       }
       roadmapViewport.scrollLeft = centerX * next - roadmapViewport.clientWidth / 2;
     };
-    const scrollToRoadmapEnd = () => { roadmapViewport.scrollLeft = roadmapCanvas.scrollWidth; };
+    const scrollToRoadmapEnd = () => {
+      const nodes = all('.road-node-item', roadmapCanvas);
+      const target = nodes[Math.max(0, nodes.length - 3)];
+      if (target) {
+        const nodeLeft = target.offsetLeft;
+        roadmapViewport.scrollLeft = Math.max(0, nodeLeft - roadmapViewport.clientWidth * 0.15);
+      } else {
+        roadmapViewport.scrollLeft = roadmapCanvas.scrollWidth;
+      }
+    };
 
     query('#zoomInBtn')?.addEventListener('click', () => applyZoom(currentScale + 0.15));
     query('#zoomOutBtn')?.addEventListener('click', () => applyZoom(currentScale - 0.15));

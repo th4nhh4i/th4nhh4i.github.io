@@ -4,7 +4,7 @@
   const root = document.documentElement;
   const KEY = 'th4nhh4i-appearance-v1';
   const defaults = { palette: 'violet', surface: 'midnight', glow: 'on' };
-  const allowed = { palette: ['violet', 'ocean', 'amber', 'rose'], surface: ['midnight', 'slate', 'black'], glow: ['on', 'off'] };
+  const allowed = { palette: ['violet', 'blue', 'amber', 'red'], surface: ['midnight', 'slate', 'black'], glow: ['on', 'off'] };
   let preferences = { ...defaults };
   try {
     const saved = JSON.parse(localStorage.getItem(KEY));
@@ -31,10 +31,10 @@
       <div class="appearance-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h2 id="appearance-title">Góc nhìn của bạn.</h2></div><button class="appearance-close" type="button" aria-label="Đóng tùy chỉnh" autofocus>×</button></div>
       <p class="appearance-description" id="appearance-description">Một chút màu sắc, một chút cá tính.<br>Tùy chỉnh được áp dụng ngay trên trang.</p>
       <fieldset><legend>Màu nhấn</legend><div class="appearance-options">
-        ${choice('palette', 'violet', 'Tím', ['#bda4ff', '#b8f4ce'])}
-        ${choice('palette', 'ocean', 'Đại dương', ['#81cfff', '#94f1dc'])}
+        ${choice('palette', 'violet', 'Purple Team', ['#bda4ff', '#b8f4ce'])}
+        ${choice('palette', 'blue', 'Blue Team', ['#4d93ff', '#7fe3f0'])}
         ${choice('palette', 'amber', 'Hổ phách', ['#f5c18d', '#f4df9b'])}
-        ${choice('palette', 'rose', 'Hồng', ['#f1a9ce', '#c7beff'])}
+        ${choice('palette', 'red', 'Red Team', ['#ff6b6b', '#ffb08a'])}
       </div></fieldset>
       <fieldset><legend>Sắc độ nền</legend><div class="appearance-options surfaces">
         ${choice('surface', 'midnight', 'Đêm tím')}${choice('surface', 'slate', 'Xanh đá')}${choice('surface', 'black', 'Đen sâu')}

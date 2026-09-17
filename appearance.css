@@ -11,9 +11,9 @@
   --accent-rgb: 189, 164, 255;
   --core-hue: 0deg;
 }
-:root[data-palette="ocean"] { --purple: #81cfff; --lime: #94f1dc; --accent-rgb: 129, 207, 255; --core-hue: -55deg; }
+:root[data-palette="blue"] { --purple: #4d93ff; --lime: #7fe3f0; --accent-rgb: 77, 147, 255; --core-hue: -40deg; }
 :root[data-palette="amber"] { --purple: #f5c18d; --lime: #f4df9b; --accent-rgb: 245, 193, 141; --core-hue: 145deg; }
-:root[data-palette="rose"] { --purple: #f1a9ce; --lime: #c7beff; --accent-rgb: 241, 169, 206; --core-hue: 40deg; }
+:root[data-palette="red"] { --purple: #ff6b6b; --lime: #ffb08a; --accent-rgb: 255, 107, 107; --core-hue: 104deg; }
 :root[data-surface="slate"] { --bg: #171b26; --panel: #202635; --panel-raised: #2a3244; --line: #3d465a; --muted: #b5bbcc; }
 :root[data-surface="black"] { --bg: #08090c; --panel: #111217; --panel-raised: #1a1b22; --line: #2d2e37; }
 body { background-color: var(--bg); }
@@ -77,12 +77,57 @@ html.motion-reduced *, html.motion-reduced *::before, html.motion-reduced *::aft
 /* Native dialog keeps keyboard focus inside the appearance controls. */
 .appearance-launcher {
   position: fixed; right: 24px; bottom: max(24px, env(safe-area-inset-bottom)); z-index: 45;
-  display: inline-flex; align-items: center; gap: 9px; padding: 12px 16px;
+  display: inline-flex; align-items: center; gap: 0; padding: 13px;
   border: 1px solid rgba(var(--accent-rgb), .35); border-radius: 50px;
   background: var(--panel); color: var(--text); font: 11px var(--font); box-shadow: 0 8px 30px #0005;
 }
 .appearance-launcher svg { width: 17px; height: 17px; color: var(--purple); }
 .appearance-launcher:hover { border-color: var(--purple); background: var(--panel-raised); }
+/* Lối vào Field Notes — dùng nền sáng tương phản với nút Giao diện để hút mắt. */
+.blog-launcher {
+  position: fixed; right: 24px; bottom: calc(max(24px, env(safe-area-inset-bottom)) + 55px); z-index: 46;
+  display: inline-flex; align-items: center; gap: 0; padding: 13px;
+  border-radius: 50px; text-decoration: none;
+  background: linear-gradient(112deg, var(--lime), var(--purple));
+  color: #0b0b0e; font: 600 11.5px var(--font);
+  box-shadow: 0 8px 28px rgba(var(--accent-rgb), .32), 0 2px 10px #0006;
+  transition: transform .22s var(--ease), box-shadow .22s var(--ease);
+}
+.blog-launcher svg { width: 16px; height: 16px; }
+.blog-launcher-count {
+  padding: 2px 7px; border-radius: 20px; background: #0b0b0e26;
+  font: 600 9.5px var(--mono); letter-spacing: .06em;
+}
+.blog-launcher:hover, .blog-launcher:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(var(--accent-rgb), .48), 0 3px 12px #0007;
+}
+.blog-launcher:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+
+/* Mặc định chỉ hiện icon (nút tròn); nhãn trượt ra khi trỏ vào hoặc focus bằng bàn phím. */
+.blog-launcher>svg, .appearance-launcher>svg { flex: 0 0 auto; }
+.blog-launcher-label, .blog-launcher-count, .appearance-launcher>span {
+  max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap;
+  transition: max-width .28s var(--ease), opacity .16s linear,
+    margin-left .28s var(--ease), padding .28s var(--ease);
+}
+.blog-launcher-count { padding-inline: 0; }
+.blog-launcher:hover .blog-launcher-label, .blog-launcher:focus-visible .blog-launcher-label,
+.appearance-launcher:hover>span, .appearance-launcher:focus-visible>span {
+  max-width: 160px; opacity: 1; margin-left: 9px;
+}
+.blog-launcher:hover .blog-launcher-count, .blog-launcher:focus-visible .blog-launcher-count {
+  max-width: 48px; opacity: 1; margin-left: 8px; padding-inline: 7px;
+}
+/* Quầng sáng lan ra để thu hút chú ý mà không cần chuyển động gây phân tán. */
+.blog-launcher::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  border: 1.5px solid var(--lime); animation: blog-launcher-pulse 2.8s var(--ease) infinite;
+}
+@keyframes blog-launcher-pulse {
+  0% { opacity: .65; transform: scale(1); }
+  70%, 100% { opacity: 0; transform: scale(1.3); }
+}
 .appearance-dialog {
   width: min(390px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto;
   margin: auto; padding: 26px; border-radius: 20px; border: 1px solid rgba(var(--accent-rgb), .32);
@@ -117,9 +162,14 @@ html.motion-reduced *, html.motion-reduced *::before, html.motion-reduced *::aft
 .appearance-save-state { font: 9px var(--mono); color: var(--muted); }
 .appearance-reset { background: transparent; color: var(--purple); font-size: 11px; padding: 8px 0 8px 8px; }
 @media (max-width: 760px) {
-  .appearance-launcher { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); padding: 12px; }
-  .appearance-launcher>span { display: none; }
+  .appearance-launcher { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); }
   .appearance-dialog { padding: 22px; }
+  .blog-launcher { right: 16px; bottom: calc(max(16px, env(safe-area-inset-bottom)) + 53px); }
 }
-@media (prefers-reduced-motion: reduce) { .ambient-card::after { display: none; } }
-@media print { .appearance-launcher, .appearance-dialog, body::before, .ambient-card::after { display: none !important; } }
+@media (prefers-reduced-motion: reduce) {
+  .ambient-card::after { display: none; }
+  .blog-launcher { transition: none; }
+  .blog-launcher::before { animation: none; opacity: 0; }
+  .blog-launcher-label, .blog-launcher-count, .appearance-launcher>span { transition: none; }
+}
+@media print { .appearance-launcher, .appearance-dialog, .blog-launcher, body::before, .ambient-card::after { display: none !important; } }
