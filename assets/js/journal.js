@@ -73,8 +73,7 @@
   }, { all: metadata.length });
   document.querySelectorAll('[data-count]').forEach(element => {
     const count = counts[element.dataset.count] || 0;
-    element.textContent = element.dataset.count === 'cyberdefenders' && count === 0
-      ? 'Sắp có' : String(count).padStart(2, '0');
+    element.textContent = String(count).padStart(2, '0');
   });
   const latest = metadata.reduce((best, item) => (!best || item.timestamp > best.timestamp ? item : best), null);
   document.querySelectorAll('[data-latest]').forEach(element => {
@@ -149,8 +148,7 @@
 
   function setActiveType(type) {
     activeType = type;
-    document.body.classList.toggle('is-lab-view', type === 'lab' || type === 'cyberdefenders');
-    document.body.classList.toggle('is-cyberdefenders-view', type === 'cyberdefenders');
+    document.body.classList.toggle('is-lab-view', type === 'lab');
     filters.forEach(filter => {
       const active = filter.dataset.filter === type;
       filter.classList.toggle('active', active);
@@ -189,11 +187,8 @@
       }
     });
     resultCount.textContent = `${visible}${visible !== cards.length ? ` / ${cards.length}` : ''} bài viết`;
-    const upcoming = activeType === 'cyberdefenders' && !query && activeTag === 'all';
-    empty.querySelector('h3').textContent = upcoming ? 'CyberDefenders đang chuẩn bị.' : 'Không tìm thấy vật chứng nào.';
-    empty.querySelector('p').textContent = upcoming
-      ? 'Các writeup sẽ xuất hiện tại đây sau khi mình hoàn thành lab.'
-      : 'Thử từ khóa khác, hoặc xóa bộ lọc để xem toàn bộ thư viện.';
+    empty.querySelector('h3').textContent = 'Không tìm thấy vật chứng nào.';
+    empty.querySelector('p').textContent = 'Thử từ khóa khác, hoặc xóa bộ lọc để xem toàn bộ thư viện.';
     empty.hidden = visible !== 0;
     grid.hidden = visible === 0;
     if (sync) syncURL();

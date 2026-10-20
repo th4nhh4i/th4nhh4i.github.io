@@ -13,12 +13,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="portfolio.css">
-  <link rel="stylesheet" href="journal.css">
-  <link rel="stylesheet" href="evidence.css?v=16">
-  <link rel="stylesheet" href="appearance.css?v=11">
-  <link rel="stylesheet" href="blog-reference.css?v=5">
-  <script src="appearance.js?v=4"></script>
+  <link rel="stylesheet" href="assets/css/portfolio.css">
+  <link rel="stylesheet" href="assets/css/journal.css">
+  <link rel="stylesheet" href="assets/css/evidence.css?v=16">
+  <link rel="stylesheet" href="assets/css/appearance.css?v=11">
+  <link rel="stylesheet" href="assets/css/blog-reference.css?v=5">
+  <script src="assets/js/appearance.js?v=4"></script>
   <script>
     /* Chạy sớm: bật reveal và phủ màn nếu vừa chuyển trang; tự gỡ nếu app.js không tải được. */
     (function () {
@@ -34,8 +34,8 @@
       setTimeout(function () { if (!window.th4nhh4iReady) root.classList.remove('js', 'is-arriving'); }, 3000);
     })();
   </script>
-  <script src="app.js?v=6" defer></script>
-  <script src="journal.js?v=3" defer></script>
+  <script src="assets/js/app.js?v=6" defer></script>
+  <script src="assets/js/journal.js?v=3" defer></script>
 </head>
 <body class="journal-page">
   <svg class="note-sprite" width="0" height="0" aria-hidden="true" style="position:absolute">
@@ -100,9 +100,8 @@
       <div class="library-heading">
         <div>
           <p class="journal-eyebrow">THE LIBRARY</p>
-          <h2 id="library-title"><span class="library-title-default">Tất cả <span>ghi chép.</span></span><span class="library-title-lab">HomeLab <span>Blue Team.</span></span><span class="library-title-cyberdefenders">Cyber<span>Defenders.</span></span></h2>
-          <p class="lab-view-copy">7 báo cáo HomeLab Blue Team đã thực hiện. Các writeup CyberDefenders sẽ được thêm sau khi hoàn thành.</p>
-          <p class="cyberdefenders-view-copy">Không gian dành cho các bài phân tích CyberDefenders sắp tới. Mỗi lab sẽ có tên, ngày và liên kết đến writeup khi hoàn thành.</p>
+          <h2 id="library-title"><span class="library-title-default">Tất cả <span>ghi chép.</span></span><span class="library-title-lab">HomeLab <span>Blue Team.</span></span></h2>
+          <p class="lab-view-copy">7 báo cáo HomeLab Blue Team đã thực hiện.</p>
         </div>
         <span class="library-code">grep -ri "curiosity" ./notes</span>
       </div>

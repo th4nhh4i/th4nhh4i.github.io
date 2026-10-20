@@ -20,8 +20,8 @@ body { background-color: var(--bg); }
 
 /* Con trỏ kính lúp forensics. Hotspot (14 14) nằm giữa tròng kính. */
 :root {
-  --cursor-lens: url("images/cursor/forensic-cursor-48.png") 14 14, default;
-  --cursor-lens-active: url("images/cursor/forensic-cursor-48.png") 14 14, pointer;
+  --cursor-lens: url("../../images/cursor/forensic-cursor-48.png") 14 14, default;
+  --cursor-lens-active: url("../../images/cursor/forensic-cursor-48.png") 14 14, pointer;
 }
 html, body { cursor: var(--cursor-lens); }
 :is(a[href], button, summary, select, label, [role="button"], .node-card, .filter-btn, .zoom-btn, .blog-tag-pill, .appearance-choice):not(:disabled, [aria-disabled="true"]) { cursor: var(--cursor-lens-active); }

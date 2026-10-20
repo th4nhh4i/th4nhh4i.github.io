@@ -32,10 +32,13 @@ Welcome to my personal cybersecurity portfolio and CV website, showcasing my kno
 
 ## 📁 Project Structure
 
-- `index.html` – Login interface with client-side validation  
-- `profile.html` – Detailed profile page about cybersecurity concepts  
-- `css/`, `js/`, `images/` – Organized asset folders for styling and scripts  
+- `index.html`, `blog.html` — public entry pages for GitHub Pages.
+- `assets/css/`, `assets/js/` — shared styles and page scripts.
+- `images/` — site images, CTF covers, and cursor assets.
+- `src/` — source for the interactive 3D Cyber Journey and its data.
+- `vendor/` — local Three.js modules used by the static site.
+- `blog/`, `wu/` — lab notes and CTF writeups.
+- `docs/labs/` — original lab reports in Word format.
+- `docs/cyber-3d-roadmap.md` — Cyber Journey planning notes.
 
----
-
-🔐 *Crafted with care by Lê Thanh Hải – a passionate learner in the field of cybersecurity and web development.*
+Run `npm install` then `npm run dev` for a local preview. The HTML and asset files in the repository root are served directly by GitHub Pages.

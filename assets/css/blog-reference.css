@@ -21,7 +21,7 @@
   z-index: -1;
 }
 .journal-page .journal-hero::before {
-  background: url("images/blog-city-banner.png") center 43% / cover no-repeat;
+  background: url("../../images/blog-city-banner.png") center 43% / cover no-repeat;
   filter: hue-rotate(32deg) saturate(.7);
 }
 .journal-page .journal-hero::after {

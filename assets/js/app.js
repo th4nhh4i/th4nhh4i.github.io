@@ -5,8 +5,8 @@
 
   window.th4nhh4iReady = true;
 
-  const scriptURL = document.currentScript?.src || new URL('app.js', location.href).href;
-  const siteURL = new URL('./', scriptURL);
+  const scriptURL = document.currentScript?.src || new URL('assets/js/app.js', location.href).href;
+  const siteURL = new URL('../../', scriptURL);
   const root = document.documentElement;
   const query = (selector, scope = document) => scope.querySelector(selector);
   const all = (selector, scope = document) => [...scope.querySelectorAll(selector)];
