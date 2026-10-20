@@ -652,3 +652,91 @@
   line-height: 1;
   vertical-align: 0;
 }
+
+/* Wider road and a small explorer at the final milestone. */
+.road-finish-character {
+  position: absolute;
+  left: 13125px;
+  top: 170px;
+  width: 130px;
+  height: 180px;
+  z-index: 8;
+  pointer-events: none;
+  filter: drop-shadow(0 0 15px rgba(0, 255, 204, .42));
+}
+.road-finish-character svg { display: block; width: 120px; height: 180px; margin: 0 auto; }
+.road-finish-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 5px);
+  transform: translateX(-50%);
+  padding: .38rem .6rem;
+  border: 1px solid rgba(0, 255, 204, .55);
+  border-radius: 6px;
+  background: rgba(8, 17, 37, .92);
+  color: #00ffcc;
+  font-size: .65rem;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  box-shadow: 0 0 18px rgba(0, 255, 204, .18);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .road-finish-character svg { animation: explorerBreathe 3s ease-in-out infinite; transform-origin: 50% 95%; }
+  @keyframes explorerBreathe { 50% { transform: translateY(-4px); } }
+}
+
+.road-future-end { top: 405px; transform: none; }
+
+/* Winding overview map — five serpentine rows instead of a long strip. */
+.roadmap-viewport { height: min(70vh, 640px); min-height: 500px; overflow: auto; overscroll-behavior: contain; }
+.roadmap-canvas, .road-nodes-container, .winding-road-svg { width: 3100px; height: 2400px; }
+.roadmap-canvas { transform-origin: 0 0; }
+.road-node-item { height: 1px; width: 280px; }
+.road-node-item.pos-top, .road-node-item.pos-bottom { top: auto; }
+.road-node-item .node-circle { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); }
+.road-node-item .node-card { position: absolute; left: 50%; width: 280px; transform: translateX(-50%); }
+.road-node-item.pos-top .node-card { top: auto; bottom: 70px; }
+.road-node-item.pos-bottom .node-card { top: 70px; bottom: auto; }
+.road-node-item .node-circle:hover { transform: translate(-50%, -50%) scale(1.08); }
+.roadmap-canvas .year-divider-marker[hidden] { display: none; }
+.map-year-label {
+  position: absolute;
+  z-index: 7;
+  transform: translateX(-50%);
+  padding: 5px 14px;
+  border: 1px solid #00ffcc;
+  border-radius: 99px;
+  background: #09182b;
+  color: #00ffcc;
+  font: 700 18px 'Fira Code', monospace;
+  letter-spacing: .1em;
+  box-shadow: 0 0 22px #00ffcc44;
+  pointer-events: none;
+}
+.roadmap-canvas .road-finish-character { z-index: 9; }
+.roadmap-canvas .road-future-end { transform: none; }
+
+
+/* Raised road and isometric city scenery. The city lives behind the route and cards. */
+.roadmap-canvas {
+  background-color: #080f21;
+  background-image:
+    radial-gradient(circle at 48% 44%, rgba(20, 72, 117, .22), transparent 58%),
+    linear-gradient(rgba(41, 91, 131, .12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(41, 91, 131, .12) 1px, transparent 1px);
+  background-size: 100% 100%, 80px 80px, 80px 80px;
+}
+.map-city-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 3100px;
+  height: 2400px;
+  overflow: visible;
+  pointer-events: none;
+}
+.map-city-block { filter: drop-shadow(8px 10px 7px rgba(0, 0, 0, .58)); }
+.winding-road-svg .road-extrusion { filter: drop-shadow(0 14px 9px rgba(0, 0, 0, .9)); }
+.map-year-label { z-index: 1; background: rgba(8, 25, 42, .94); }
+.road-node-item { z-index: 2; }
+.road-node-item.node-highlighted { z-index: 12; }

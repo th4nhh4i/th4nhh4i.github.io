@@ -326,41 +326,32 @@
   const roadmapCanvas = query('#roadmapCanvas');
   if (roadmapViewport && roadmapCanvas) {
     const roadNodes = all('.road-node-item', roadmapCanvas);
-    const minScale = 0.5;
+    const mapWidth = Number(roadmapCanvas.dataset.mapWidth) || 3100;
+    const mapHeight = Number(roadmapCanvas.dataset.mapHeight) || 2400;
     const maxScale = 2.2;
     let currentScale = 1;
-    // Dùng `zoom` để vùng cuộn co giãn theo (transform: scale giữ nguyên độ rộng canvas nên thu nhỏ ở cuối đường sẽ ra khoảng trống).
-    // Giữ điểm đang xem ở giữa khung và giữ con đường cân giữa theo chiều dọc như transform-origin 0 50% của bản gốc.
-    const supportsZoom = 'zoom' in roadmapCanvas.style;
+    const overviewScale = () => Math.min(
+      roadmapViewport.clientWidth / mapWidth,
+      roadmapViewport.clientHeight / mapHeight
+    ) * 0.94;
     const applyZoom = scale => {
-      const next = Math.min(Math.max(scale, minScale), maxScale);
+      const next = Math.min(Math.max(scale, overviewScale()), maxScale);
       const centerX = (roadmapViewport.scrollLeft + roadmapViewport.clientWidth / 2) / currentScale;
+      const centerY = (roadmapViewport.scrollTop + roadmapViewport.clientHeight / 2) / currentScale;
       currentScale = next;
-      if (supportsZoom) {
-        roadmapCanvas.style.zoom = String(next);
-        roadmapCanvas.style.marginTop = `${(roadmapViewport.clientHeight * (1 - next)) / (2 * next)}px`;
-      } else {
-        roadmapCanvas.style.transform = `scale(${next})`;
-      }
+      roadmapCanvas.style.zoom = String(next);
       roadmapViewport.scrollLeft = centerX * next - roadmapViewport.clientWidth / 2;
+      roadmapViewport.scrollTop = centerY * next - roadmapViewport.clientHeight / 2;
     };
-    const scrollToRoadmapEnd = () => {
-      const nodes = all('.road-node-item', roadmapCanvas);
-      const target = nodes[Math.max(0, nodes.length - 3)];
-      if (target) {
-        const nodeLeft = target.offsetLeft;
-        roadmapViewport.scrollLeft = Math.max(0, nodeLeft - roadmapViewport.clientWidth * 0.15);
-      } else {
-        roadmapViewport.scrollLeft = roadmapCanvas.scrollWidth;
-      }
+    const showOverview = () => {
+      applyZoom(overviewScale());
+      roadmapViewport.scrollLeft = 0;
+      roadmapViewport.scrollTop = 0;
     };
 
-    query('#zoomInBtn')?.addEventListener('click', () => applyZoom(currentScale + 0.15));
-    query('#zoomOutBtn')?.addEventListener('click', () => applyZoom(currentScale - 0.15));
-    query('#zoomResetBtn')?.addEventListener('click', () => {
-      applyZoom(1);
-      scrollToRoadmapEnd();
-    });
+    query('#zoomInBtn')?.addEventListener('click', () => applyZoom(currentScale * 1.4));
+    query('#zoomOutBtn')?.addEventListener('click', () => applyZoom(currentScale / 1.4));
+    query('#zoomResetBtn')?.addEventListener('click', showOverview);
 
     // Menu bộ lọc thả xuống
     const filterToggle = query('#filterToggleBtn');
@@ -389,13 +380,22 @@
     }
 
     // Lọc theo loại sự kiện / năm; năm thì cuộn tới mốc đầu tiên của năm đó
-    const yearOffsets = { 'year-2023': 0, 'year-2024': 1420, 'year-2025': 2700, 'year-2026': 7500 };
+    const focusNode = node => {
+      if (!node) return;
+      applyZoom(Math.max(currentScale, 0.7));
+      roadmapViewport.scrollTo({
+        left: node.offsetLeft * currentScale - roadmapViewport.clientWidth / 2,
+        top: node.offsetTop * currentScale - roadmapViewport.clientHeight / 2,
+        behavior: motionEnabled ? 'smooth' : 'auto'
+      });
+    };
     const filterButtons = all('.filter-btn', roadmapViewport.parentElement);
     filterButtons.forEach(button => button.addEventListener('click', () => {
       filterButtons.forEach(other => other.classList.toggle('active', other === button));
       const filter = button.dataset.filter;
-      if (filter in yearOffsets) {
-        roadmapViewport.scrollTo({ left: yearOffsets[filter] * currentScale, behavior: motionEnabled ? 'smooth' : 'auto' });
+      if (filter.startsWith('year-')) {
+        const year = filter.slice(5);
+        focusNode(roadNodes.find(node => (query('.node-date', node)?.textContent || '').includes(year)));
       }
       roadNodes.forEach(node => {
         if (filter === 'all') {
@@ -413,13 +413,16 @@
         node.classList.toggle('node-dimmed', !match);
         node.classList.toggle('node-highlighted', match);
       });
+      setFilterMenu(false);
     }));
 
     // Kéo chuột để cuộn; không mở/đóng thẻ nếu vừa kéo
     let isDragging = false;
     let dragMoved = false;
     let startX = 0;
+    let startY = 0;
     let startScroll = 0;
+    let startScrollY = 0;
     const endDrag = () => {
       isDragging = false;
       roadmapViewport.classList.remove('dragging');
@@ -428,17 +431,21 @@
       isDragging = true;
       dragMoved = false;
       roadmapViewport.classList.add('dragging');
-      startX = event.pageX - roadmapViewport.offsetLeft;
+      startX = event.pageX;
+      startY = event.pageY;
       startScroll = roadmapViewport.scrollLeft;
+      startScrollY = roadmapViewport.scrollTop;
     });
     roadmapViewport.addEventListener('mouseleave', endDrag);
     roadmapViewport.addEventListener('mouseup', endDrag);
     roadmapViewport.addEventListener('mousemove', event => {
       if (!isDragging) return;
       event.preventDefault();
-      const walk = (event.pageX - roadmapViewport.offsetLeft - startX) * 1.5;
-      if (Math.abs(walk) > 6) dragMoved = true;
+      const walk = (event.pageX - startX) * 1.5;
+      const rise = (event.pageY - startY) * 1.5;
+      if (Math.abs(walk) > 6 || Math.abs(rise) > 6) dragMoved = true;
       roadmapViewport.scrollLeft = startScroll - walk;
+      roadmapViewport.scrollTop = startScrollY - rise;
     });
     roadmapViewport.addEventListener('wheel', event => {
       if (!event.ctrlKey) return;
@@ -452,6 +459,13 @@
       card.setAttribute('role', 'button');
       card.setAttribute('aria-expanded', 'false');
       const toggle = () => {
+        if (currentScale < 0.5) {
+          applyZoom(0.8);
+          const node = card.closest('.road-node-item');
+          roadmapViewport.scrollLeft = node.offsetLeft * currentScale - roadmapViewport.clientWidth / 2;
+          roadmapViewport.scrollTop = node.offsetTop * currentScale - roadmapViewport.clientHeight / 2;
+          return;
+        }
         const expanded = card.classList.toggle('expanded');
         card.setAttribute('aria-expanded', String(expanded));
       };
@@ -468,9 +482,10 @@
       });
     });
 
-    // Mặc định hiển thị đoạn đường mới nhất
-    if (document.readyState === 'complete') setTimeout(scrollToRoadmapEnd, 300);
-    else window.addEventListener('load', () => setTimeout(scrollToRoadmapEnd, 300));
+    // Mặc định hiển thị toàn bộ hành trình
+    if (document.readyState === 'complete') showOverview();
+    else window.addEventListener('load', showOverview, { once: true });
+    window.addEventListener('resize', () => { if (currentScale <= overviewScale() * 1.05) showOverview(); });
 
     // Chuỗi hash cho lệnh `ledger` trong terminal
     (async () => {
@@ -542,7 +557,7 @@
       terminalOutput.scrollTop = terminalOutput.scrollHeight;
     };
     const destinations = {
-      home: 'home', about: 'about', projects: 'projects', skills: 'skills', method: 'method',
+      home: 'home', about: 'about', projects: 'projects',
       resume: 'resume', experience: 'resume', roadmap: 'resume', ledger: 'resume', contact: 'contact', gallery: 'gallery-sec'
     };
     const visit = name => {
@@ -607,10 +622,10 @@
       const target = (args[0] || '').toLowerCase();
       switch (command.toLowerCase()) {
         case 'help':
-          appendLine('help                 Danh sách lệnh\nwhoami               Giới thiệu nhanh\nls                   Xem danh mục & tệp\ncd <mục>             about · projects · skills · method · roadmap\n                     gallery · contact · blog\ncat <tệp>            about.txt · contact.txt · readme.md · case.log\nsha256sum <tệp>      Băm SHA-256 kiểm tra toàn vẹn\nstrings evidence.bin Tìm chuỗi ẩn trong vật chứng\nvol.py pslist        "Phân tích bộ nhớ" của portfolio\nledger               5 cột mốc mới nhất, nối chuỗi SHA-256\ndate · pwd · clear · exit\n\nMẹo: Tab để gợi ý, ↑ / ↓ để xem lệnh trước.');
+          appendLine('help                 Danh sách lệnh\nwhoami               Giới thiệu nhanh\nls                   Xem danh mục & tệp\ncd <mục>             about · projects · roadmap\n                     gallery · contact · blog\ncat <tệp>            about.txt · contact.txt · readme.md · case.log\nsha256sum <tệp>      Băm SHA-256 kiểm tra toàn vẹn\nstrings evidence.bin Tìm chuỗi ẩn trong vật chứng\nvol.py pslist        "Phân tích bộ nhớ" của portfolio\nledger               5 cột mốc mới nhất, nối chuỗi SHA-256\ndate · pwd · clear · exit\n\nMẹo: Tab để gợi ý, ↑ / ↓ để xem lệnh trước.');
           break;
         case 'whoami': appendLine(fileText['about.txt']); break;
-        case 'ls': appendLine('about/    projects/  skills/   method/   roadmap/\ngallery/  contact/   blog/\n\nabout.txt   contact.txt   readme.md   case.log   evidence.bin'); break;
+        case 'ls': appendLine('about/    projects/  roadmap/\ngallery/  contact/   blog/\n\nabout.txt   contact.txt   readme.md   case.log   evidence.bin'); break;
         case 'pwd': appendLine('/home/th4nhh4i/evidence'); break;
         case 'clear': terminalOutput.replaceChildren(); break;
         case 'date': appendLine(new Intl.DateTimeFormat('vi-VN', { dateStyle: 'full', timeStyle: 'long', timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date())); break;
@@ -685,18 +700,75 @@
     openDialog(gallery, button);
   }));
   all('.gallery-close').forEach(button => button.addEventListener('click', () => closeDialog(gallery)));
+  // ===== Hai nhóm ảnh tự chuyển, giữ data-image đồng bộ với lightbox =====
+  const gallerySlideSets = {
+    competition: [
+      ['images/2.jpg', 'Đồng đội tại cuộc thi CTF'],
+      ['images/6.jpg', 'Khoảnh khắc thi đấu Hackathon'],
+      ['images/anh1.jpg', 'RMIT Hackathon 2025'],
+      ['images/cscv-2026-team.jpg', 'Đội GDU tại CSCV 2026'],
+      ['images/cscv-2026-group.jpg', 'CSCV 2026 — đội GDU chụp ảnh cùng thầy'],
+      ['images/ctf-team-focus.jpg', 'Tập trung giải thử thách cùng đồng đội']
+    ],
+    certificates: [
+      ['images/CCEP_certificate.jpg', 'CCEP — Certificate of Achievement'],
+      ['images/1.jpg', 'Bằng khen CTF'],
+      ['images/3.jpg', 'Chứng nhận cuộc thi'],
+      ['images/hero_certif.jpg', 'Hero Certification'],
+      ['images/cert_cisco.png', 'Chứng chỉ Cisco Networking & Security']
+    ]
+  };
+  all('.gallery-slideshow').forEach((card, groupIndex) => {
+    const slides = gallerySlideSets[card.dataset.galleryGroup];
+    const frames = all('.gallery-frame', card);
+    const counter = query('.gallery-slide-count', card);
+    if (!slides || frames.length !== 2) return;
+    let current = 0;
+    let active = 0;
+    let loading = false;
+    const advance = () => {
+      const bounds = card.getBoundingClientRect();
+      const inView = bounds.bottom > 0 && bounds.top < window.innerHeight;
+      if (!motionEnabled || !inView || document.hidden || gallery?.open ||
+          card.matches(':hover') || card.matches(':focus') || loading) return;
+      const next = (current + 1) % slides.length;
+      const [source, caption] = slides[next];
+      const nextFrame = frames[1 - active];
+      loading = true;
+      let finished = false;
+      const reveal = () => {
+        if (finished) return;
+        finished = true;
+        if (!nextFrame.naturalWidth) { loading = false; return; }
+        nextFrame.classList.add('is-visible');
+        frames[active].classList.remove('is-visible');
+        card.dataset.image = source;
+        card.dataset.caption = caption;
+        card.setAttribute('aria-label', `Xem ảnh: ${caption}`);
+        if (counter) counter.textContent = `${String(next + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+        current = next;
+        active = 1 - active;
+        loading = false;
+      };
+      nextFrame.onload = reveal;
+      nextFrame.onerror = () => { finished = true; loading = false; };
+      nextFrame.src = source;
+      if (nextFrame.complete) reveal();
+    };
+    window.setInterval(advance, 4800 + groupIndex * 700);
+  });
 
-  // ===== Sao chép email =====
-  const copyEmail = query('#copy-email');
-  const copyStatus = query('#copy-status');
-  copyEmail?.addEventListener('click', async () => {
-    const email = copyEmail.dataset.email || 'thanhhai.dakha@gmail.com';
+  // ===== Sao chép Discord từ contact dock =====
+  const copyDiscord = query('#copy-discord');
+  const contactStatus = query('#contact-status');
+  copyDiscord?.addEventListener('click', async () => {
+    const handle = copyDiscord.dataset.handle || 'Th4nhH4i';
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
-      await navigator.clipboard.writeText(email);
-      if (copyStatus) copyStatus.textContent = 'Đã sao chép email.';
+      await navigator.clipboard.writeText(handle);
+      if (contactStatus) contactStatus.textContent = `Đã sao chép Discord: ${handle}`;
     } catch {
-      if (copyStatus) copyStatus.textContent = `Không thể sao chép tự động. Email: ${email}`;
+      if (contactStatus) contactStatus.textContent = `Discord: ${handle}`;
     }
   });
 

@@ -17,6 +17,15 @@
 :root[data-surface="slate"] { --bg: #171b26; --panel: #202635; --panel-raised: #2a3244; --line: #3d465a; --muted: #b5bbcc; }
 :root[data-surface="black"] { --bg: #08090c; --panel: #111217; --panel-raised: #1a1b22; --line: #2d2e37; }
 body { background-color: var(--bg); }
+
+/* Con trỏ kính lúp forensics. Hotspot (14 14) nằm giữa tròng kính. */
+:root {
+  --cursor-lens: url("images/cursor/forensic-cursor-48.png") 14 14, default;
+  --cursor-lens-active: url("images/cursor/forensic-cursor-48.png") 14 14, pointer;
+}
+html, body { cursor: var(--cursor-lens); }
+:is(a[href], button, summary, select, label, [role="button"], .node-card, .filter-btn, .zoom-btn, .blog-tag-pill, .appearance-choice):not(:disabled, [aria-disabled="true"]) { cursor: var(--cursor-lens-active); }
+:is(input:not([type="button"], [type="submit"], [type="checkbox"], [type="radio"], [type="range"]), textarea, [contenteditable="true"]) { cursor: text; }
 body::before {
   content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background: radial-gradient(ellipse at 86% 8%, rgba(var(--accent-rgb), .085), transparent 48%), radial-gradient(ellipse at 0% 65%, rgba(var(--accent-rgb), .035), transparent 42%);
@@ -169,7 +178,6 @@ html.motion-reduced *, html.motion-reduced *::before, html.motion-reduced *::aft
 @media (prefers-reduced-motion: reduce) {
   .ambient-card::after { display: none; }
   .blog-launcher { transition: none; }
-  .blog-launcher::before { animation: none; opacity: 0; }
-  .blog-launcher-label, .blog-launcher-count, .appearance-launcher>span { transition: none; }
+  .blog-launcher::before { animation: none; opacity: 0; }  .blog-launcher-label, .blog-launcher-count, .appearance-launcher>span { transition: none; }
 }
 @media print { .appearance-launcher, .appearance-dialog, .blog-launcher, body::before, .ambient-card::after { display: none !important; } }

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="CSCV 2026 Chung khảo FOR01: khôi phục tin nhắn ChatApp từ SQLite WAL và giải mã bằng ChaCha20.">
+  <title>CSCV 2026 - Chung khảo · FOR01 ChatApp | Th4nhH4i</title>
+  <link rel="icon" href="../../../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    try {
+      const saved = JSON.parse(localStorage.getItem('th4nhh4i-appearance-v1'));
+      if (['violet', 'blue', 'amber', 'red'].includes(saved?.palette)) document.documentElement.dataset.palette = saved.palette;
+      if (['midnight', 'slate', 'black'].includes(saved?.surface)) document.documentElement.dataset.surface = saved.surface;
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="../../../appearance.css?v=11">
+  <style>
+    :root { --bg:#0d0d14;--panel:#171720;--line:#30303f;--text:#f3f1fa;--muted:#aaa7ba;--purple:#4d93ff;--lime:#7fe3f0; color-scheme:dark; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0;background:var(--bg);color:var(--text);font:15px/1.75 'Plus Jakarta Sans',system-ui,sans-serif; }
+    a { color:var(--lime);overflow-wrap:anywhere; }
+    a:hover { color:var(--purple); }
+    .wu-shell { width:min(900px,calc(100% - 40px));margin:auto;padding:42px 0 90px; }
+    .wu-back { display:inline-block;margin-bottom:20px;color:var(--muted);font:11px 'DM Mono',monospace;letter-spacing:.08em;text-decoration:none; }
+    .wu-back:hover { color:var(--lime); }
+    .wu-banner { display:block;width:100%;max-height:250px;object-fit:cover;border:1px solid var(--line);border-radius:14px; }
+    .wu-head { padding:28px 0 26px;border-bottom:1px solid var(--line); }
+    .wu-kicker { color:var(--purple);font:11px 'DM Mono',monospace;letter-spacing:.13em; }
+    h1 { margin:12px 0 15px;font-size:clamp(29px,4vw,44px);line-height:1.2;letter-spacing:-.035em; }
+    .wu-meta { display:flex;flex-wrap:wrap;gap:7px 22px;color:var(--muted);font:11px 'DM Mono',monospace; }
+    .wu-intro { margin:23px 0;color:var(--muted); }
+    .wu-toc { margin:25px 0 38px;padding:18px 22px;border:1px solid var(--line);border-radius:12px;background:var(--panel); }
+    .wu-toc::before { content:'TRONG BÀI VIẾT';display:block;color:var(--purple);font:10px 'DM Mono',monospace;letter-spacing:.1em; }
+    .wu-toc ul { margin:10px 0 0;padding-left:20px; }
+    .wu-toc li { margin:4px 0; }
+    .wu-toc a { text-decoration:none;color:var(--text);font-size:13px; }
+    .wu-toc a:hover { color:var(--lime); }
+    .wu-body h2 { margin:44px 0 12px;padding-top:20px;border-top:1px solid var(--line);font-size:26px;line-height:1.35;letter-spacing:-.025em;scroll-margin-top:24px; }
+    .wu-body h3 { margin:28px 0 10px;color:var(--purple);font-size:19px;scroll-margin-top:24px; }
+    .wu-body p,.wu-body li { color:#d6d4e1; }
+    .wu-body p { margin:14px 0; }
+    .wu-body li { margin:5px 0; }
+    .wu-body figure { margin:24px 0; }
+    .wu-body figure img { display:block;max-width:100%;height:auto;margin:auto;border:1px solid var(--line);border-radius:10px; }
+    .wu-body figcaption { margin-top:7px;color:var(--muted);font-size:11px;text-align:center; }
+    .wu-body code { padding:1px 5px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:#d9d0ff;font:0.9em 'DM Mono',monospace;overflow-wrap:anywhere; }
+    .wu-body pre { overflow:auto;margin:18px 0;padding:16px 18px;border:1px solid var(--line);border-radius:10px;background:var(--panel); }
+    .wu-body pre code { padding:0;border:0;background:none;color:#c9e7ff;line-height:1.6;overflow-wrap:normal; }
+    .wu-body blockquote { margin:18px 0;padding:5px 18px;border-left:2px solid var(--purple);border-radius:0 8px 8px 0;background:var(--panel); }
+    .wu-body blockquote p { margin:9px 0; }
+    .wu-body table { display:block;width:100%;margin:18px 0;overflow-x:auto;border-collapse:collapse;font-size:13px; }
+    .wu-body th,.wu-body td { padding:9px 11px;border:1px solid var(--line);text-align:left;vertical-align:top; }
+    .wu-body th { background:var(--panel);color:var(--purple); }
+    .wu-flag { margin-top:22px;padding:20px 22px;border:1px solid var(--purple);border-radius:12px;background:var(--panel);box-shadow:0 0 24px rgba(77,147,255,.12); }
+    .wu-flag-label { display:block;margin-bottom:9px;color:var(--purple);font:11px 'DM Mono',monospace;letter-spacing:.1em; }
+    .wu-flag code { color:var(--text);font:600 clamp(13px,2vw,19px) 'DM Mono',monospace;overflow-wrap:anywhere; }
+    .wu-foot { margin-top:20px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font:11px/1.8 'DM Mono',monospace; }
+    @media (max-width:600px) { .wu-shell { width:calc(100% - 32px);padding-top:24px; } .wu-body h2 { font-size:22px; } .wu-body pre { padding:12px; } .wu-banner { max-height:160px; } }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+  </style>
+</head>
+<body>
+  <main class="wu-shell">
+    <a class="wu-back" href="../index.html">← MỤC LỤC CSCV 2026</a>
+    <img class="wu-banner" src="../../../images/cscv-2026-banner.jpg" alt="Cybersecurity Student Contest 2026">
+    <header class="wu-head">
+      <div class="wu-kicker">CSCV 2026 · CHUNG KHẢO · FORENSICS / FOR01</div>
+      <h1>CSCV 2026 Chung khảo — Tìm thông điệp ẩn trong ChatApp</h1>
+      <div class="wu-meta"><span>Th4nhH4i</span><span>Cập nhật 21/10/2026</span><span>SQLite WAL · Android APK · ChaCha20</span></div>
+    </header>
+    <nav class="wu-toc" aria-label="Mục lục bài viết">
+<ul>
+<li><a href="#boi-canh-va-du-lieu-nhan-uoc">Bối cảnh và dữ liệu nhận được</a></li>
+<li><a href="#dau-vet-bat-thuong-trong-wal">Dấu vết bất thường trong WAL</a></li>
+<li><a href="#tim-quy-tac-chon-va-thu-tu-byte">Tìm quy tắc chọn và thứ tự byte</a></li>
+<li><a href="#giai-ma-thong-iep">Giải mã thông điệp</a></li>
+</ul>
+</nav>
+
+    <article class="wu-body">
+<blockquote>
+<p><strong>Thể loại:</strong> Mobile Forensics · SQLite WAL · Android APK · ChaCha20<br />
+<strong>Mục tiêu:</strong> tìm <code>secret_message</code> và nộp theo dạng <code>CSCV2026{&lt;secret_message&gt;}</code>.</p>
+</blockquote>
+<h2 id="boi-canh-va-du-lieu-nhan-uoc">Bối cảnh và dữ liệu nhận được</h2>
+<p>Đề <strong>FOR01</strong> mô tả một chiếc điện thoại bị thu giữ trong quá trình điều tra. Dữ liệu của ứng dụng nhắn tin nội bộ đã được trích xuất; nhiệm vụ của mình là tìm thông điệp bí mật ẩn trong đó.</p>
+<figure><img src="images/00-for01-de-bai.png" alt="Ảnh chụp đề FOR01 với mô tả điều tra ứng dụng nhắn tin và định dạng flag CSCV2026" loading="lazy"><figcaption>Ảnh chụp đề FOR01 với mô tả điều tra ứng dụng nhắn tin và định dạng flag CSCV2026</figcaption></figure>
+<p>Thư mục <code>artifact</code> có <code>chatapp.apk</code>, cơ sở dữ liệu SQLite <code>databases/chatapp.db</code> cùng hai tệp đi kèm <code>chatapp.db-wal</code>, <code>chatapp.db-shm</code>, và cấu hình <code>shared_prefs/chat_prefs.xml</code>. Tệp WAL đặc biệt đáng chú ý: SQLite lưu các phiên bản trang cơ sở dữ liệu theo cơ chế ghi trước vào WAL, nên nó có thể giữ dấu vết mà truy vấn trạng thái hiện tại không còn cho thấy. <a href="https://www.sqlite.org/wal.html">Tài liệu SQLite về WAL</a> giải thích cách bản ghi giao dịch được thêm vào tệp này và cách SQLite chọn phiên bản trang để đọc.</p>
+<figure><img src="images/01-artifact-folder.jpg" alt="Thư mục artifact gốc mở trong File Explorer, gồm chatapp.apk, databases và shared_prefs" loading="lazy"><figcaption>Thư mục artifact gốc mở trong File Explorer, gồm chatapp.apk, databases và shared_prefs</figcaption></figure>
+<figure><img src="images/02-sqlite-files.jpg" alt="Ba tệp chatapp.db, chatapp.db-shm và chatapp.db-wal trong thư mục databases" loading="lazy"><figcaption>Ba tệp chatapp.db, chatapp.db-shm và chatapp.db-wal trong thư mục databases</figcaption></figure>
+<table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th style="text-align: right;">Kích thước</th>
+<th>SHA-256</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>chatapp.apk</code></td>
+<td style="text-align: right;">11.764.975 byte</td>
+<td><code>65aa2173bbc269db1c03521f422870c31fc5b0c3a8f9c54dd60e6827a906926e</code></td>
+</tr>
+<tr>
+<td><code>chatapp.db</code></td>
+<td style="text-align: right;">9.072.640 byte</td>
+<td><code>ca8840dc01df7e78d2bbab5277aca5b7eefe4ae2865bfe94453a418917c3ec4f</code></td>
+</tr>
+<tr>
+<td><code>chatapp.db-wal</code></td>
+<td style="text-align: right;">24.752 byte</td>
+<td><code>8cd5fc0926b126ee6f9a4cbfa0fdd6f69bcb896f6d7454b0286874bf248ec4c4</code></td>
+</tr>
+</tbody>
+</table>
+<p>Mình phân tích trên bản sao để không làm thay đổi artifact gốc. Điều này quan trọng với WAL: mở cơ sở dữ liệu cùng tệp <code>-wal</code> bằng một kết nối có quyền ghi có thể làm phát sinh checkpoint và thay đổi bản sao WAL. Script tái lập ở cuối bài chỉ đọc byte từ nguồn rồi dựng snapshot trong một tệp tạm.</p>
+<h2 id="dau-vet-bat-thuong-trong-wal">Dấu vết bất thường trong WAL</h2>
+<p>Truy vấn <code>chatapp.db</code> ở trạng thái hiện tại cho thấy hai bảng <code>threads</code> và <code>messages</code>, gồm <strong>5 nhóm và 951 tin nhắn</strong>. Các tin nhắn nhìn chung là hội thoại thường ngày; tìm trực tiếp flag hoặc thông điệp bí mật trong cột <code>body</code> không cho kết quả.</p>
+<p>Mình chuyển sang đọc cấu trúc <code>chatapp.db-wal</code>. Header WAL dài 32 byte; với kích thước trang 4.096 byte, mỗi frame gồm header 24 byte và một trang dữ liệu 4.096 byte. Tệp dài 24.752 byte, đúng bằng <code>32 + 6 × (24 + 4.096)</code>, tức có <strong>6 frame</strong>. <a href="https://www.sqlite.org/fileformat2.html#walformat">Định dạng tệp SQLite</a> mô tả cấu trúc header và frame này.</p>
+<pre><code class="language-python">import struct
+
+wal = open(&quot;databases/chatapp.db-wal&quot;, &quot;rb&quot;).read()
+page_size = struct.unpack_from(&quot;&gt;I&quot;, wal, 8)[0]  # 4096
+for i in range((len(wal) - 32) // (24 + page_size)):
+    offset = 32 + i * (24 + page_size)
+    page_no, db_pages = struct.unpack_from(&quot;&gt;II&quot;, wal, offset)
+    print(i, page_no, db_pages)
+</code></pre>
+<pre><code class="language-text">0 2215 2215
+1 3    0
+2 2166 0
+3 2214 0
+4 2215 2215
+5 2215 2215
+</code></pre>
+<p>Trang <strong>2215</strong> xuất hiện ở frame 0, 4 và 5. Đây là lý do để so sánh các phiên bản của cùng một trang. Mình lấy 4.096 byte dữ liệu của từng frame, thay vào đúng vị trí trang 2215 trên <strong>bản sao</strong> <code>chatapp.db</code>, rồi truy vấn bản dựng lại bằng SQLite.</p>
+<table>
+<thead>
+<tr>
+<th>Phiên bản trang 2215</th>
+<th style="text-align: right;">Số tin nhắn truy vấn được</th>
+<th>ID 888–919</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frame 0</td>
+<td style="text-align: right;">919</td>
+<td>32 dòng có <code>body</code> dạng Base64</td>
+</tr>
+<tr>
+<td>Frame 4</td>
+<td style="text-align: right;">887</td>
+<td>Không còn các dòng này</td>
+</tr>
+<tr>
+<td>Frame 5 / DB hiện tại</td>
+<td style="text-align: right;">951</td>
+<td>ID được dùng lại với hội thoại bình thường</td>
+</tr>
+</tbody>
+</table>
+<p>Ví dụ, ở frame 0, ID <strong>888</strong> thuộc nhóm <code>ATTT Group</code>, do <strong>Quân</strong> gửi lúc <strong>02/09/2026 11:00:07 UTC+7</strong>, có <code>body = Yw==</code>. Giải Base64 được đúng một byte <code>0x63</code>. Trong DB hiện tại, chính ID 888 lại có nội dung “user đó đổi mật khẩu chưa, ai confirm giúp”. ID 889 và 890 đều chứa <code>wg==</code> trong frame 0, mỗi chuỗi cho byte <code>0xc2</code>. Sự thay đổi đồng loạt của 32 dòng cho thấy bản cũ trong WAL mới là dấu vết cần theo tiếp.</p>
+<p>Mình trích toàn bộ ID <strong>888–919</strong> thành <a href="recovered_messages.csv">bảng đối chiếu</a>. Nếu chỉ ghép 32 byte theo ID tăng dần thì thu được chuỗi nhị phân sau, chưa phải bản rõ:</p>
+<pre><code class="language-text">63c2c25fc84999828d79c52b5ff343eba9a20132af2c552b3e7f8cacfbc74713
+</code></pre>
+<h2 id="tim-quy-tac-chon-va-thu-tu-byte">Tìm quy tắc chọn và thứ tự byte</h2>
+<p>Để hiểu 32 byte này, mình xem <code>chatapp.apk</code>. Lớp <code>com.example.chatapp.Constants</code> chứa các giá trị:</p>
+<figure><img src="images/04-apk-constants.jpg" alt="Lớp Constants được trích từ APK mở trong Notepad, hiển thị NONCE_HEX, ORDER_XOR, SECRET_MESSAGE và SELECT_MOD" loading="lazy"><figcaption>Lớp Constants được trích từ APK mở trong Notepad, hiển thị NONCE_HEX, ORDER_XOR, SECRET_MESSAGE và SELECT_MOD</figcaption></figure>
+<pre><code class="language-text">SECRET_MESSAGE = &quot;sqlite3_forensics_2026&quot;
+SELECT_MOD     = 3
+ORDER_XOR      = 931071618  # 0x377f0682
+NONCE_HEX      = &quot;706eeff3706eeff3706eeff3706eeff3&quot;
+</code></pre>
+<p><code>ORDER_XOR</code> bằng magic <code>0x377f0682</code> ở đầu WAL. Giá trị này vừa củng cố hướng kiểm tra WAL, vừa gợi ý dùng XOR khi xử lý thứ tự. <code>SELECT_MOD</code> cho thấy cần chọn một phần bản ghi thay vì giải cả 32 byte. Phần chưa rõ là áp dụng chúng lên ID hay timestamp; mình kiểm tra các cách tương ứng và dùng kết quả giải mã có nghĩa để xác nhận.</p>
+<p>Quy tắc khớp là <strong>giữ các dòng có <code>(timestamp ^ ORDER_XOR) % SELECT_MOD == 0</code></strong>, rồi <strong>sắp tăng dần theo <code>timestamp ^ ORDER_XOR</code></strong>. Có 16 dòng được chọn, với ID theo đúng thứ tự:</p>
+<pre><code class="language-text">888, 891, 892, 895, 894, 901, 904, 902, 900, 907, 905, 910, 909, 913, 912, 915
+</code></pre>
+<p>Sau khi giải Base64 từng <code>body</code> và ghép theo thứ tự đó, ciphertext là:</p>
+<pre><code class="language-text">635fc88299f3a9435f32a2552c7f3eac
+</code></pre>
+<p>Chú ý ID <strong>895 đứng trước 894</strong> trong chuỗi đã sắp; ghép theo ID tăng dần sẽ cho ciphertext khác. Đây là bước dễ làm sai nhất của bài.</p>
+<h2 id="giai-ma-thong-iep">Giải mã thông điệp</h2>
+<p>Tệp <code>shared_prefs/chat_prefs.xml</code> có giá trị <code>device_salt = bVaN8B8ekPGF5tPMwKoubg==</code>. Giải Base64 được 16 byte <code>6d568df01f1e90f185e6d3ccc0aa2e6e</code>. Mình lấy SHA-256 của <code>SECRET_MESSAGE</code> ở dạng UTF-8 <strong>nối trực tiếp</strong> với salt này để tạo khóa 32 byte:</p>
+<figure><img src="images/03-device-salt.jpg" alt="Tệp chat_prefs.xml mở trong Notepad với giá trị device_salt" loading="lazy"><figcaption>Tệp chat_prefs.xml mở trong Notepad với giá trị device_salt</figcaption></figure>
+<pre><code class="language-text">SHA256(b&quot;sqlite3_forensics_2026&quot; + device_salt)
+= a8dab43b712b4880894ab4bc0515a8748b81368c5f44d4dd43067c9172cbe6c6
+</code></pre>
+<p>Dùng khóa đó, nonce 16 byte từ <code>NONCE_HEX</code>, và ChaCha20 để giải mã ciphertext. Mã dưới đây là phần cốt lõi; <a href="solve.py">script đầy đủ</a> còn tự dựng snapshot từ WAL:</p>
+<pre><code class="language-python">import base64
+import hashlib
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms
+
+salt = base64.b64decode(&quot;bVaN8B8ekPGF5tPMwKoubg==&quot;)
+key = hashlib.sha256(b&quot;sqlite3_forensics_2026&quot; + salt).digest()
+nonce = bytes.fromhex(&quot;706eeff3706eeff3706eeff3706eeff3&quot;)
+ciphertext = bytes.fromhex(&quot;635fc88299f3a9435f32a2552c7f3eac&quot;)
+
+message = Cipher(algorithms.ChaCha20(key, nonce), mode=None) \
+    .decryptor().update(ciphertext).decode(&quot;ascii&quot;)
+print(message)
+</code></pre>
+<pre><code class="language-text">W4l_1s_s0_c00l!!
+</code></pre>
+<p>Thư viện <code>cryptography</code> nhận khóa ChaCha20 dài 32 byte và tham số nonce dài 16 byte cho API này; vì vậy cần truyền đúng toàn bộ <code>NONCE_HEX</code>, không cắt còn 12 byte như ở một số API khác. <a href="https://cryptography.io/en/latest/hazmat/primitives/symmetric-encryption/#cryptography.hazmat.primitives.ciphers.algorithms.ChaCha20">Tài liệu <code>cryptography</code> về ChaCha20</a>.</p>
+<p>Để kiểm tra từ artifact gốc, chạy:</p>
+<pre><code class="language-powershell">python solve.py &quot;F:\CSCV\CHUNG KHẢO\artifact&quot;
+</code></pre>
+<pre><code class="language-text">Ciphertext: 635fc88299f3a9435f32a2552c7f3eac
+Secret message: W4l_1s_s0_c00l!!
+</code></pre>
+    </article>
+    <div class="wu-flag" aria-label="For1 Flag"><span class="wu-flag-label">For1 Flag :</span><code>CSCV2026{W4l_1s_s0_c00l!!}</code></div>
+    <p class="wu-foot" role="status">FOR02 và FOR03 — mình đang viết.</p>
+  </main>
+</body>
+</html>

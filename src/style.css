@@ -1,0 +1,14 @@
+/* Bước 1: lớp nền riêng cho map 3D, kế thừa bảng màu của website. */
+.cyber3d-map {
+  --cyber3d-cyan: #00ffcc;
+  --cyber3d-pink: #f43f5e;
+  --cyber3d-surface: rgba(9, 13, 26, .86);
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--cyber3d-surface);
+}
+.cyber3d-map[hidden] { display: none; }
+.cyber3d-map canvas { display: block; width: 100%; height: 100%; }
+.cyber3d-map .cyber3d-overlay { position: absolute; inset: 0; pointer-events: none; }

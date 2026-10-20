@@ -10,10 +10,14 @@
   const sort = document.getElementById('blogSort');
   const filters = [...document.querySelectorAll('.blog-filter-btn')];
   const cloud = document.getElementById('tagFiltersCloud');
+  const sidebarCloud = document.getElementById('tagSidebarCloud');
+  const labRecent = document.getElementById('labRecent');
+  const labTags = document.getElementById('labTags');
   const resultCount = document.getElementById('resultCount');
   const empty = document.getElementById('noResults');
   const tagLabel = document.getElementById('selectedTagLabel');
   const tagPicker = document.querySelector('.journal-tag-picker');
+  document.getElementById('showAllTags')?.addEventListener('click', () => { if (tagPicker) tagPicker.open = true; });
   const library = document.getElementById('journal-library');
   const helpers = window.th4nhh4i || {};
   const motionEnabled = () => helpers.motionEnabled ?? !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -68,7 +72,9 @@
     return acc;
   }, { all: metadata.length });
   document.querySelectorAll('[data-count]').forEach(element => {
-    element.textContent = String(counts[element.dataset.count] || 0).padStart(2, '0');
+    const count = counts[element.dataset.count] || 0;
+    element.textContent = element.dataset.count === 'cyberdefenders' && count === 0
+      ? 'Sắp có' : String(count).padStart(2, '0');
   });
   const latest = metadata.reduce((best, item) => (!best || item.timestamp > best.timestamp ? item : best), null);
   document.querySelectorAll('[data-latest]').forEach(element => {
@@ -88,7 +94,7 @@
     }));
   }
 
-  function addTagButton(key, label) {
+  function addTagButton(key, label, container = cloud) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'tag-pill-btn';
@@ -99,13 +105,41 @@
       updateTagButtons();
       filterPosts();
     });
-    cloud.append(button);
+    container.append(button);
   }
   addTagButton('all', 'Tất cả chủ đề');
   [...cloudTags].sort((a, b) => a[1].localeCompare(b[1], 'vi')).forEach(([key, name]) => addTagButton(key, name));
+  if (sidebarCloud) {
+    const tagCounts = new Map();
+    metadata.forEach(item => item.tags.forEach(key => tagCounts.set(key, (tagCounts.get(key) || 0) + 1)));
+    [...tagCounts].filter(([key]) => cloudTags.has(key))
+      .sort((a, b) => b[1] - a[1] || (tagLabels.get(a[0]) || a[0]).localeCompare(tagLabels.get(b[0]) || b[0], 'vi'))
+      .slice(0, 9).forEach(([key]) => addTagButton(key, `# ${tagLabels.get(key)}`, sidebarCloud));
+  }
+  const labPosts = metadata.filter(item => item.type === 'lab');
+  if (labRecent) {
+    [...labPosts].sort((a, b) => b.timestamp - a.timestamp || a.index - b.index).slice(0, 5).forEach(item => {
+      const original = item.card.querySelector('.note-title a');
+      const link = document.createElement('a');
+      link.href = original.href;
+      link.textContent = item.title;
+      if (original.target) {
+        link.target = original.target;
+        link.rel = original.rel;
+      }
+      labRecent.append(link);
+    });
+  }
+  if (labTags) {
+    const counts = new Map();
+    labPosts.forEach(item => item.tags.forEach(key => counts.set(key, (counts.get(key) || 0) + 1)));
+    [...counts].filter(([key]) => cloudTags.has(key))
+      .sort((a, b) => b[1] - a[1] || (tagLabels.get(a[0]) || a[0]).localeCompare(tagLabels.get(b[0]) || b[0], 'vi'))
+      .slice(0, 9).forEach(([key]) => addTagButton(key, `# ${tagLabels.get(key)}`, labTags));
+  }
 
   function updateTagButtons() {
-    cloud.querySelectorAll('button').forEach(button => {
+    document.querySelectorAll('#tagFiltersCloud button, #tagSidebarCloud button, #labTags button').forEach(button => {
       const active = button.dataset.tag === activeTag;
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', String(active));
@@ -115,6 +149,8 @@
 
   function setActiveType(type) {
     activeType = type;
+    document.body.classList.toggle('is-lab-view', type === 'lab' || type === 'cyberdefenders');
+    document.body.classList.toggle('is-cyberdefenders-view', type === 'cyberdefenders');
     filters.forEach(filter => {
       const active = filter.dataset.filter === type;
       filter.classList.toggle('active', active);
@@ -153,6 +189,11 @@
       }
     });
     resultCount.textContent = `${visible}${visible !== cards.length ? ` / ${cards.length}` : ''} bài viết`;
+    const upcoming = activeType === 'cyberdefenders' && !query && activeTag === 'all';
+    empty.querySelector('h3').textContent = upcoming ? 'CyberDefenders đang chuẩn bị.' : 'Không tìm thấy vật chứng nào.';
+    empty.querySelector('p').textContent = upcoming
+      ? 'Các writeup sẽ xuất hiện tại đây sau khi mình hoàn thành lab.'
+      : 'Thử từ khóa khác, hoặc xóa bộ lọc để xem toàn bộ thư viện.';
     empty.hidden = visible !== 0;
     grid.hidden = visible === 0;
     if (sync) syncURL();
@@ -165,6 +206,10 @@
   }
 
   filters.forEach(button => button.addEventListener('click', () => {
+    if (activeType !== button.dataset.filter) {
+      activeTag = 'all';
+      updateTagButtons();
+    }
     setActiveType(button.dataset.filter);
     filterPosts();
   }));

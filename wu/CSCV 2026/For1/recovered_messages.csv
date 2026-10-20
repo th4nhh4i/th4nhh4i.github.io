@@ -1,0 +1,33 @@
+﻿id,thread_id,sender_old,body_old_base64,byte_hex,timestamp_old_ICT,is_read_old,body_current
+888,5,Quân,Yw==,63,2026-09-02T11:00:07+07:00,1,"user đó đổi mật khẩu chưa, ai confirm giúp"
+889,5,Thảo,wg==,c2,2026-09-02T11:04:23+07:00,1,"on-call tuần này mình, page nếu sev1"
+890,5,Lan,wg==,c2,2026-09-02T11:11:41+07:00,0,ack
+891,5,Đức,Xw==,5f,2026-09-02T12:09:35+07:00,0,"mấy IP này mình chặn tạm, ai thấy sai thì nói"
+892,5,Linh,yA==,c8,2026-09-02T12:10:23+07:00,0,mình escalate ticket này lên L2
+893,5,Mai,SQ==,49,2026-09-02T12:12:23+07:00,1,noted
+894,5,Ngọc,mQ==,99,2026-09-02T12:16:34+07:00,1,noted
+895,5,Hà,gg==,82,2026-09-02T12:19:47+07:00,0,đã close
+896,5,Trang,jQ==,8d,2026-09-02T12:20:30+07:00,0,mình check
+897,5,Sơn,eQ==,79,2026-09-02T12:46:23+07:00,0,đã close
+898,5,Trang,xQ==,c5,2026-09-02T12:51:13+07:00,1,đã close
+899,5,Đức,Kw==,2b,2026-09-02T14:11:31+07:00,0,mình escalate ticket này lên L2
+900,5,Hùng,Xw==,5f,2026-09-02T14:17:21+07:00,0,báo cáo tuần mình gửi chiều nay
+901,5,Linh,8w==,f3,2026-09-02T14:21:50+07:00,0,"ca sáng handover: 2 open, 1 waiting IT, 0 sev1"
+902,5,Ngọc,Qw==,43,2026-09-02T14:24:21+07:00,1,"user đó đổi mật khẩu chưa, ai confirm giúp"
+903,5,Ngọc,6w==,eb,2026-09-02T14:25:11+07:00,1,patch đợt này ưu tiên server trước
+904,5,Phúc,qQ==,a9,2026-09-02T14:27:11+07:00,0,"on-call tuần này mình, page nếu sev1"
+905,5,Hùng,og==,a2,2026-09-02T14:51:06+07:00,0,"log hôm qua có gì lạ không, mình chưa kịp soi"
+906,5,Hùng,AQ==,01,2026-09-02T14:54:25+07:00,0,patch đợt này ưu tiên server trước
+907,5,Vy,Mg==,32,2026-09-02T14:58:31+07:00,0,"không xoá evidence, copy ra share forensics"
+908,5,Trang,rw==,af,2026-09-02T14:59:20+07:00,0,"không xoá evidence, copy ra share forensics"
+909,5,Phúc,LA==,2c,2026-09-02T15:02:55+07:00,1,"rule cũ sinh cảnh báo hơi nhiều, cần tune"
+910,5,Linh,VQ==,55,2026-09-02T15:05:35+07:00,1,đã close
+911,5,Trang,Kw==,2b,2026-09-02T16:02:20+07:00,1,"log hôm qua có gì lạ không, mình chưa kịp soi"
+912,5,Vy,Pg==,3e,2026-09-02T16:06:19+07:00,1,patch đợt này ưu tiên server trước
+913,5,Minh,fw==,7f,2026-09-02T16:08:35+07:00,1,"log hôm qua có gì lạ không, mình chưa kịp soi"
+914,5,Mai,jA==,8c,2026-09-02T16:51:51+07:00,0,mình escalate ticket này lên L2
+915,5,Vy,rA==,ac,2026-09-02T17:02:17+07:00,0,noted
+916,5,Lan,+w==,fb,2026-09-02T17:08:37+07:00,0,"rule cũ sinh cảnh báo hơi nhiều, cần tune"
+917,5,Ngọc,xw==,c7,2026-09-02T17:10:35+07:00,1,ack
+918,5,Trang,Rw==,47,2026-09-02T17:26:20+07:00,0,đã close
+919,5,Hùng,Ew==,13,2026-09-02T17:39:01+07:00,0,"ca sáng handover: 2 open, 1 waiting IT, 0 sev1"

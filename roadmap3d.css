@@ -1,0 +1,187 @@
+/* Three.js city diorama for the journey section. The original timeline stays as a fallback. */
+.roadmap3d-active .roadmap-controls { display: none; }
+.roadmap3d-active #roadmapViewport {
+  height: min(90vh, 900px);
+  min-height: 760px;
+  overflow: hidden;
+  cursor: default;
+  border: 1px solid rgba(76, 174, 210, .23);
+  border-radius: 16px;
+}
+.roadmap3d-active #roadmapCanvas { display: none; }
+.roadmap3d-stage {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: #eef8ff;
+  background: radial-gradient(circle at 50% 28%, #1b3146, #070d19 70%);
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+}
+.roadmap3d-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(3, 10, 21, .74), transparent 24%, transparent 74%, rgba(3, 10, 21, .73));
+}
+.roadmap3d-stage canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+.roadmap3d-stage canvas:active { cursor: grabbing; }
+.roadmap3d-head {
+  position: absolute;
+  z-index: 3;
+  top: 25px;
+  left: 27px;
+  max-width: 330px;
+  display: grid;
+  gap: 7px;
+  pointer-events: none;
+  text-shadow: 0 2px 15px #030b18;
+}
+.roadmap3d-kicker {
+  color: #74f8e9;
+  font: 700 10px 'Fira Code', monospace;
+  letter-spacing: .2em;
+}
+.roadmap3d-head strong {
+  font-size: clamp(25px, 3vw, 38px);
+  letter-spacing: -.045em;
+  line-height: 1.1;
+}
+.roadmap3d-head em { display: block; color: #8ac8e5; font: 600 13px 'Fira Code', monospace; letter-spacing: .12em; margin-top: 8px; }
+.roadmap3d-hint { color: #b0c5d3; font-size: 11px; line-height: 1.5; max-width: 285px; }
+.roadmap3d-eventselect {
+  position: absolute;
+  z-index: 6;
+  top: 24px;
+  right: 22px;
+  width: min(260px, 37%);
+  padding: 9px 28px 9px 11px;
+  border: 1px solid rgba(103, 221, 231, .45);
+  border-radius: 7px;
+  background: rgba(6, 21, 36, .9);
+  color: #d3f9f7;
+  font: 600 11px 'Fira Code', monospace;
+  cursor: pointer;
+}
+.roadmap3d-yearnav, .roadmap3d-actions {
+  position: absolute;
+  z-index: 5;
+  bottom: 22px;
+  display: flex;
+  gap: 6px;
+}
+.roadmap3d-yearnav { left: 23px; }
+.roadmap3d-actions { right: 23px; }
+.roadmap3d-yearnav button, .roadmap3d-actions button {
+  border: 1px solid rgba(99, 222, 234, .38);
+  border-radius: 7px;
+  padding: 9px 11px;
+  background: rgba(7, 22, 37, .84);
+  backdrop-filter: blur(12px);
+  color: #b9fbf3;
+  font: 700 11px 'Fira Code', monospace;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0,0,0,.22);
+}
+.roadmap3d-yearnav button:hover, .roadmap3d-actions button:hover,
+.roadmap3d-yearnav button:focus-visible, .roadmap3d-actions button:focus-visible {
+  color: #061326;
+  background: #70f2e1;
+  outline: none;
+}
+.roadmap3d-yearnav button.is-active {
+  color: #061326;
+  background: var(--year-highlight, #70f2e1);
+  border-color: #dcfffc;
+  box-shadow: 0 0 18px var(--year-highlight, #70f2e1);
+}
+.roadmap3d-yearnav button[data-year="2023"] { --year-highlight: #63f8e9; }
+.roadmap3d-yearnav button[data-year="2024"] { --year-highlight: #ff72ab; }
+.roadmap3d-yearnav button[data-year="2025"] { --year-highlight: #ffd978; }
+.roadmap3d-yearnav button[data-year="2026"] { --year-highlight: #76baff; }
+.roadmap3d-actions button:first-child, .roadmap3d-actions button:nth-child(2) { min-width: 34px; font-size: 17px; padding: 5px 8px; }
+.roadmap3d-caption {
+  position: absolute;
+  z-index: 3;
+  bottom: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  color: rgba(178, 221, 239, .75);
+  font: 700 9px 'Fira Code', monospace;
+  letter-spacing: .17em;
+  pointer-events: none;
+}
+.roadmap3d-caption span { color: #60e9dc; margin: 0 9px; }
+.roadmap3d-milestone {
+  position: absolute;
+  z-index: 4;
+  transform: translate(-50%, calc(-100% - 7px));
+  width: max-content;
+  max-width: 112px;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 5px;
+  text-align: left;
+  border: 1px solid rgba(95, 246, 225, .67);
+  border-radius: 5px;
+  padding: 4px 6px;
+  background: rgba(5, 20, 32, .94);
+  color: #e8fffc;
+  font: 700 8.5px 'Fira Code', monospace;
+  line-height: 1.2;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .5), 0 0 12px rgba(25, 219, 211, .25);
+  cursor: pointer;
+}
+.roadmap3d-milestone-number { flex: none; color: #64f1e4; font-size: 8px; }
+.roadmap3d-milestone-title { min-width: 0; overflow-wrap: anywhere; }
+.roadmap3d-milestone:hover, .roadmap3d-milestone:focus-visible, .roadmap3d-milestone.is-active { z-index: 5; border-color: #ff78ab; background: #163443; box-shadow: 0 0 20px rgba(255, 95, 145, .45); outline: none; }
+.roadmap3d-card {
+  position: absolute;
+  z-index: 7;
+  top: 71px;
+  right: 22px;
+  width: min(290px, calc(100% - 44px));
+  padding: 20px;
+  border: 1px solid rgba(97, 230, 225, .65);
+  border-radius: 12px;
+  background: rgba(5, 18, 33, .91);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, .42), 0 0 24px rgba(17, 217, 207, .13);
+}
+.roadmap3d-card[hidden] { display: none; }
+.roadmap3d-card-meta { display: block; max-width: 90%; color: #76f6e7; font: 700 10px 'Fira Code', monospace; letter-spacing: .02em; line-height: 1.5; }
+.roadmap3d-card h3 { margin: 12px 0 8px; font-size: 17px; line-height: 1.35; color: white; }
+.roadmap3d-card p { margin: 0 0 15px; color: #c5d9e2; font-size: 12px; line-height: 1.6; }
+.roadmap3d-card small { color: #90b0be; font: 600 10px 'Fira Code', monospace; }
+.roadmap3d-card-nav { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding-top: 12px; border-top: 1px solid rgba(97, 230, 225, .23); }
+.roadmap3d-card-nav button { min-height: 35px; padding: 6px 9px; border: 1px solid rgba(97, 230, 225, .5); border-radius: 6px; color: #76f6e7; background: rgba(16, 58, 75, .5); font: 700 11px 'Fira Code', monospace; cursor: pointer; white-space: nowrap; }
+.roadmap3d-card-nav button:hover:not(:disabled), .roadmap3d-card-nav button:focus-visible { background: rgba(31, 143, 161, .45); border-color: #76f6e7; }
+.roadmap3d-card-nav button:disabled { opacity: .35; cursor: default; }
+.roadmap3d-card-count { white-space: nowrap; text-align: center; }
+.roadmap3d-card-close { position: absolute; top: 10px; right: 12px; border: 0; background: none; color: #b1d8e2; font-size: 23px; cursor: pointer; }
+@media (max-width: 700px) {
+  .roadmap3d-active #roadmapViewport { height: 790px; min-height: 790px; }
+  .roadmap3d-head { top: 17px; left: 17px; }
+  .roadmap3d-head strong { font-size: 25px; }
+  .roadmap3d-hint { font-size: 10px; }
+  .roadmap3d-eventselect { top: 112px; left: 12px; right: auto; width: min(265px, calc(100% - 24px)); }
+  .roadmap3d-card { top: 158px; right: 12px; padding: 14px; }
+  .roadmap3d-milestone { max-width: 92px; padding: 4px; gap: 3px; font-size: 7px; }
+  .roadmap3d-milestone-number { font-size: 7px; }
+  .roadmap3d-yearnav { left: 12px; bottom: 14px; gap: 3px; }
+  .roadmap3d-actions { right: 12px; bottom: 59px; gap: 4px; }
+  .roadmap3d-yearnav button, .roadmap3d-actions button { padding: 7px; font-size: 10px; }
+  .roadmap3d-caption { bottom: 101px; font-size: 8px; }
+}

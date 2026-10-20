@@ -3,7 +3,7 @@
   'use strict';
   const root = document.documentElement;
   const KEY = 'th4nhh4i-appearance-v1';
-  const defaults = { palette: 'violet', surface: 'midnight', glow: 'on' };
+  const defaults = { palette: 'blue', surface: 'midnight', glow: 'on' };
   const allowed = { palette: ['violet', 'blue', 'amber', 'red'], surface: ['midnight', 'slate', 'black'], glow: ['on', 'off'] };
   let preferences = { ...defaults };
   try {

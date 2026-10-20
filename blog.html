@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0b0e">
-  <meta name="description" content="Field Notes — writeup CTF, báo cáo lab Purple Team và bài báo về Lê Thanh Hải.">
+  <meta name="description" content="Field Notes — writeup CTF, HomeLab Blue Team và bài báo về Lê Thanh Hải.">
   <meta property="og:title" content="Field Notes — Lê Thanh Hải">
-  <meta property="og:description" content="Writeup CTF, lab Purple Team và những điều học được về an toàn thông tin.">
+  <meta property="og:description" content="Writeup CTF, HomeLab Blue Team và những điều học được về an toàn thông tin.">
   <meta property="og:type" content="website">
   <title>Field Notes — Lê Thanh Hải</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -15,9 +15,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="portfolio.css">
   <link rel="stylesheet" href="journal.css">
-  <link rel="stylesheet" href="evidence.css?v=12">
-  <link rel="stylesheet" href="appearance.css?v=4">
-  <script src="appearance.js?v=3"></script>
+  <link rel="stylesheet" href="evidence.css?v=16">
+  <link rel="stylesheet" href="appearance.css?v=11">
+  <link rel="stylesheet" href="blog-reference.css?v=5">
+  <script src="appearance.js?v=4"></script>
   <script>
     /* Chạy sớm: bật reveal và phủ màn nếu vừa chuyển trang; tự gỡ nếu app.js không tải được. */
     (function () {
@@ -34,7 +35,7 @@
     })();
   </script>
   <script src="app.js?v=6" defer></script>
-  <script src="journal.js" defer></script>
+  <script src="journal.js?v=3" defer></script>
 </head>
 <body class="journal-page">
   <svg class="note-sprite" width="0" height="0" aria-hidden="true" style="position:absolute">
@@ -60,7 +61,6 @@
     <nav class="main-nav" id="main-nav" aria-label="Điều hướng chính">
       <a href="index.html#home" data-transition-label="Portfolio.">Trang chủ</a>
       <a href="index.html#projects" data-transition-label="Selected Work.">Dự án</a>
-      <a href="index.html#skills" data-transition-label="Toolkit.">Kỹ năng</a>
       <a href="index.html#resume" data-transition-label="The Journey.">Hành trình</a>
       <a href="blog.html" class="is-active" aria-current="page">Bài viết <span aria-hidden="true">↗</span></a>
     </nav>
@@ -69,30 +69,41 @@
   </header>
 
   <main id="main">
-    <section class="journal-shell journal-hero" aria-labelledby="journal-title">
-      <div class="journal-intro">
-        <p class="journal-eyebrow"><span class="journal-status-dot"></span> FIELD NOTES <span class="journal-eyebrow-index">/ EVIDENCE LOCKER</span></p>
-        <h1 id="journal-title">Học được gì,<br>mình <span>viết lại.</span></h1>
-        <p class="journal-lead">Writeup CTF. Mỗi ghi chép là một vật chứng — lưu lại cách mình đi từ dấu vết đến lời giải.</p>
-        <a class="journal-explore" href="#journal-library">Mở thư viện <span aria-hidden="true">↓</span></a>
-      </div>
-      <aside class="journal-counter" aria-label="Thống kê ghi chép">
-        <div class="counter-top"><span>EVIDENCE LOCKER</span><span>/var/notes</span></div>
-        <div class="counter-total"><b data-count="all">35</b><span>ghi chép<br>đã lưu trữ</span></div>
-        <div class="counter-grid">
-          <div><b data-count="writeup">20</b><span>Write-ups</span></div>
-          <div><b data-count="lab">07</b><span>Labs</span></div>
-          <div><b data-count="press">08</b><span>Báo chí & đưa tin</span></div>
-        </div>
-        <div class="counter-bottom"><span class="journal-status-dot"></span> SHA-256 INDEXED · CẬP NHẬT <span data-latest>—</span></div>
-      </aside>
-    </section>
+    <div class="journal-shell journal-hero" aria-hidden="true"></div>
 
     <section class="journal-shell journal-library" id="journal-library" aria-labelledby="library-title">
+      <aside class="blog-sidebar" aria-label="Hồ sơ và chủ đề blog">
+        <div class="blog-sidebar-profile">
+          <img src="images/blog-profile-logo.png" alt="Th4nhH4i Forensic" width="1050" height="434">
+        </div>
+        <div class="blog-sidebar-panel">
+          <h3>Danh mục</h3>
+          <div class="blog-sidebar-categories" role="group" aria-label="Lọc theo danh mục">
+            <button type="button" class="blog-filter-btn active" data-filter="all" aria-pressed="true">Tất cả <span data-count="all">42</span></button>
+            <button type="button" class="blog-filter-btn" data-filter="writeup" aria-pressed="false">CTF Writeups <span data-count="writeup">26</span></button>
+            <button type="button" class="blog-filter-btn" data-filter="lab" aria-pressed="false">HomeLab Blue Team <span data-count="lab">07</span></button>
+            <button type="button" class="blog-filter-btn" data-filter="cyberdefenders" aria-pressed="false">CyberDefenders <span data-count="cyberdefenders">Sắp có</span></button>
+            <button type="button" class="blog-filter-btn" data-filter="press" aria-pressed="false">Báo chí <span data-count="press">09</span></button>
+          </div>
+        </div>
+        <div class="blog-sidebar-panel" id="generalTagPanel">
+          <h3>Thẻ nổi bật</h3>
+          <div class="blog-sidebar-tags" id="tagSidebarCloud" role="group" aria-label="Lọc theo thẻ nổi bật"></div>
+          <a class="blog-sidebar-more" href="#tagFiltersCloud" id="showAllTags">Xem tất cả chủ đề ↗</a>
+        </div>
+        <div class="blog-sidebar-panel blog-lab-sidebar">
+          <h3>Mới cập nhật</h3>
+          <div class="blog-lab-recent" id="labRecent"></div>
+          <h3 class="blog-lab-tags-title">Chủ đề Lab</h3>
+          <div class="blog-sidebar-tags" id="labTags" role="group" aria-label="Lọc theo chủ đề Lab"></div>
+        </div>
+      </aside>
       <div class="library-heading">
         <div>
           <p class="journal-eyebrow">THE LIBRARY</p>
-          <h2 id="library-title">Tất cả <span>ghi chép.</span></h2>
+          <h2 id="library-title"><span class="library-title-default">Tất cả <span>ghi chép.</span></span><span class="library-title-lab">HomeLab <span>Blue Team.</span></span><span class="library-title-cyberdefenders">Cyber<span>Defenders.</span></span></h2>
+          <p class="lab-view-copy">7 báo cáo HomeLab Blue Team đã thực hiện. Các writeup CyberDefenders sẽ được thêm sau khi hoàn thành.</p>
+          <p class="cyberdefenders-view-copy">Không gian dành cho các bài phân tích CyberDefenders sắp tới. Mỗi lab sẽ có tên, ngày và liên kết đến writeup khi hoàn thành.</p>
         </div>
         <span class="library-code">grep -ri "curiosity" ./notes</span>
       </div>
@@ -115,12 +126,13 @@
 
       <div class="journal-filter-row">
         <div class="blog-filters" role="group" aria-label="Lọc theo loại ghi chép">
-          <button type="button" class="blog-filter-btn active" data-filter="all" aria-pressed="true">Tất cả <span data-count="all">35</span></button>
-          <button type="button" class="blog-filter-btn" data-filter="writeup" aria-pressed="false">Write-ups <span data-count="writeup">20</span></button>
-          <button type="button" class="blog-filter-btn" data-filter="lab" aria-pressed="false">Labs <span data-count="lab">07</span></button>
-          <button type="button" class="blog-filter-btn" data-filter="press" aria-pressed="false">Báo chí <span data-count="press">08</span></button>
+          <button type="button" class="blog-filter-btn active" data-filter="all" aria-pressed="true">Tất cả <span data-count="all">42</span></button>
+          <button type="button" class="blog-filter-btn" data-filter="writeup" aria-pressed="false">Write-ups <span data-count="writeup">26</span></button>
+          <button type="button" class="blog-filter-btn" data-filter="lab" aria-pressed="false">HomeLab Blue Team <span data-count="lab">07</span></button>
+          <button type="button" class="blog-filter-btn" data-filter="cyberdefenders" aria-pressed="false">CyberDefenders <span data-count="cyberdefenders">Sắp có</span></button>
+          <button type="button" class="blog-filter-btn" data-filter="press" aria-pressed="false">Báo chí <span data-count="press">09</span></button>
         </div>
-        <p class="journal-result-count" id="resultCount" role="status" aria-live="polite">35 bài viết</p>
+        <p class="journal-result-count" id="resultCount" role="status" aria-live="polite">42 bài viết</p>
       </div>
 
       <details class="journal-tag-picker">
@@ -129,6 +141,33 @@
       </details>
 
       <div class="notes-list" id="blogGrid">
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup cscv 2026 chung khảo chung kết for1 chatapp mobile forensics sqlite wal android apk chacha20" data-date="2026-10-21">
+          <a class="note-cover is-short" style="--cover:#102c60;--cover-ink:#ffffff" href="wu/CSCV%202026/index.html" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-poster" src="images/cscv-2026-banner.jpg" alt="" loading="lazy"><span class="note-cover-meta">CSCV 2026 · CHUNG KHẢO</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-10-21">Cập nhật 21/10/2026</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>FOR01 · Forensics</span></div>
+            <h3 class="note-title"><a href="wu/CSCV%202026/index.html" target="_blank" rel="noopener noreferrer">CSCV 2026 - Chung khảo</a></h3>
+            <p class="note-excerpt">Mục lục writeup vòng Chung khảo CSCV 2026. Bài đầu tiên, FOR01 ChatApp, khôi phục tin nhắn từ SQLite WAL và giải mã bằng ChaCha20.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CSCV 2026</span><span class="blog-tag-pill">Chung khảo</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">SQLite WAL</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+        <article class="note-card" data-type="writeup" data-tags="ctf writeup cscv 2026 sơ khảo forensic silentroom vuvt insidotage impossibilis dfir" data-date="2026-10-21">
+          <a class="note-cover is-short" style="--cover:#102c60;--cover-ink:#ffffff" href="https://hackmd.io/@qnqVUfyZQF2CCL2YnnrjPQ/B1cOVf3jGx" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-poster" src="images/cscv-2026-banner.jpg" alt="" loading="lazy"><span class="note-cover-meta">CSCV 2026 · SƠ KHẢO</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-10-21">Cập nhật 21/10/2026</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>HackMD</span></div>
+            <h3 class="note-title"><a href="https://hackmd.io/@qnqVUfyZQF2CCL2YnnrjPQ/B1cOVf3jGx" target="_blank" rel="noopener noreferrer">CSCV 2026 - Sơ khảo</a></h3>
+            <p class="note-excerpt">Writeup vòng Sơ khảo CSCV 2026: phân tích bốn thử thách Forensics — SilentRoom, VuVT, Insidotage và Impossibilis.</p>
+            <div class="note-foot"><span class="note-category">CTF Writeup</span><span class="blog-tag-pill">CSCV 2026</span><span class="blog-tag-pill">Sơ khảo</span><span class="blog-tag-pill">Forensics</span><span class="blog-tag-pill">DFIR</span><code class="note-hash"></code></div>
+          </div>
+        </article>
+        <article class="note-card" data-type="press" data-tags="báo chí truyền thông tập đoàn nguyễn hoàng nhg gdu g0ld3n_kn1ght cscv 2026 sinh viên an ninh mạng top 10 7/47" data-date="2026-10-20">
+          <a class="note-cover is-short" style="--cover:#123a5a;--cover-ink:#ffffff" href="https://www.facebook.com/share/p/19kRL71YwT/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img class="note-cover-poster" src="images/cscv-2026-group.jpg" alt="" loading="lazy"><span class="note-cover-meta">PRESS · CSCV 2026</span></a>
+          <div class="note-body">
+            <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-10-20">2026-10-20</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-source"/></svg>Tập đoàn Nguyễn Hoàng</span></div>
+            <h3 class="note-title"><a href="https://www.facebook.com/share/p/19kRL71YwT/" target="_blank" rel="noopener noreferrer">Tập đoàn Nguyễn Hoàng: GDU G0ld3n_Kn1ght vào Top 10 CSCV 2026</a></h3>
+            <p class="note-excerpt">Tập đoàn Nguyễn Hoàng chúc mừng đội tuyển G0ld3n_Kn1ght của Đại học Gia Định xếp hạng 7/47 tại vòng chung khảo Cuộc thi Sinh viên An ninh mạng 2026. Bài đăng ghi nhận năng lực và tinh thần thi đấu của đội trong các thử thách an ninh mạng.</p>
+            <div class="note-foot"><span class="note-category">Báo chí &amp; Đưa tin</span><span class="blog-tag-pill">Báo chí</span><span class="blog-tag-pill">Tập đoàn Nguyễn Hoàng</span><span class="blog-tag-pill">GDU</span><span class="blog-tag-pill">CSCV 2026</span><span class="blog-tag-pill">Top 10</span><code class="note-hash"></code></div>
+          </div>
+        </article>
         <article class="note-card" data-type="writeup" data-tags="ctf writeup security bootcamp dak lak cyberjutsu can you remember malware analysis graph traversal csp active learning 2026" data-date="2026-09-10">
           <a class="note-cover has-image" href="wu/security-bootcamp-dak-lak-2026/index.html" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="images/ctf/security-bootcamp-dak-lak-2026.png" alt="" loading="lazy"><span class="note-cover-meta">SECURITY BOOTCAMP · ĐẮK LẮK 2026</span></a>
           <div class="note-body">
@@ -163,7 +202,7 @@
             <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,326 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>10 mins</span></div>
             <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab1" target="_blank" rel="noopener noreferrer">Phát hiện leo thang đặc quyền trên Linux bằng Wazuh</a></h3>
             <p class="note-excerpt">Mô phỏng tài khoản thường lạm dụng sudo find để mở shell root, xây dựng rule phát hiện và thực hành xử lý sự cố.</p>
-            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Linux</span><span class="blog-tag-pill">Wazuh</span><span class="blog-tag-pill">Privilege Escalation</span><span class="blog-tag-pill">SOC</span><code class="note-hash"></code></div>
+            <div class="note-foot"><span class="note-category">HomeLab Blue Team</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Linux</span><span class="blog-tag-pill">Wazuh</span><span class="blog-tag-pill">Privilege Escalation</span><span class="blog-tag-pill">SOC</span><code class="note-hash"></code></div>
           </div>
         </article>
 
@@ -173,7 +212,7 @@
             <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,128 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>12 mins</span></div>
             <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab2" target="_blank" rel="noopener noreferrer">Phát hiện ransomware giả dạng file cấu hình AI Agent</a></h3>
             <p class="note-excerpt">Mô phỏng tệp update-Skill-AI.bat gọi PowerShell mã hóa dữ liệu và phát hiện chuỗi thực thi bằng Sysmon, Wazuh.</p>
-            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Ransomware</span><span class="blog-tag-pill">Sysmon</span><span class="blog-tag-pill">Wazuh</span><span class="blog-tag-pill">PowerShell</span><code class="note-hash"></code></div>
+            <div class="note-foot"><span class="note-category">HomeLab Blue Team</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Ransomware</span><span class="blog-tag-pill">Sysmon</span><span class="blog-tag-pill">Wazuh</span><span class="blog-tag-pill">PowerShell</span><code class="note-hash"></code></div>
           </div>
         </article>
 
@@ -183,7 +222,7 @@
             <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,039 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>10 mins</span></div>
             <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab3" target="_blank" rel="noopener noreferrer">Phát hiện Insider Threat đánh cắp dữ liệu nội bộ</a></h3>
             <p class="note-excerpt">Mô phỏng nhân viên thu thập, nén và tải dữ liệu nhạy cảm ra máy chủ bên ngoài; phát hiện bằng Sysmon và Wazuh.</p>
-            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Insider Threat</span><span class="blog-tag-pill">Data Exfiltration</span><span class="blog-tag-pill">Sysmon</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
+            <div class="note-foot"><span class="note-category">HomeLab Blue Team</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Insider Threat</span><span class="blog-tag-pill">Data Exfiltration</span><span class="blog-tag-pill">Sysmon</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
           </div>
         </article>
 
@@ -193,7 +232,7 @@
             <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,012 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>9 mins</span></div>
             <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab4" target="_blank" rel="noopener noreferrer">Phát hiện Brute Force SSH và RDP bằng Wazuh</a></h3>
             <p class="note-excerpt">Mô phỏng Hydra dò mật khẩu SSH/RDP, phân tích log xác thực và xây dựng custom rule mức nghiêm trọng cao.</p>
-            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Brute Force</span><span class="blog-tag-pill">SSH</span><span class="blog-tag-pill">RDP</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
+            <div class="note-foot"><span class="note-category">HomeLab Blue Team</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Brute Force</span><span class="blog-tag-pill">SSH</span><span class="blog-tag-pill">RDP</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
           </div>
         </article>
 
@@ -203,7 +242,7 @@
             <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,050 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>11 mins</span></div>
             <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab5" target="_blank" rel="noopener noreferrer">Phát hiện Reverse Shell và hành vi tạo tài khoản quản trị</a></h3>
             <p class="note-excerpt">Mô phỏng Meterpreter reverse shell, theo dõi Sysmon/Wazuh và phát hiện tạo user, thêm user vào Administrators.</p>
-            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Reverse Shell</span><span class="blog-tag-pill">Meterpreter</span><span class="blog-tag-pill">Sysmon</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
+            <div class="note-foot"><span class="note-category">HomeLab Blue Team</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Reverse Shell</span><span class="blog-tag-pill">Meterpreter</span><span class="blog-tag-pill">Sysmon</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
           </div>
         </article>
 
@@ -213,7 +252,7 @@
             <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,077 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>10 mins</span></div>
             <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab6" target="_blank" rel="noopener noreferrer">Phát hiện Network Scanning và Reconnaissance</a></h3>
             <p class="note-excerpt">Mô phỏng Nmap quét mạng, nhận diện dịch vụ, kiểm tra lỗ hổng và phát hiện bằng Windows Firewall log cùng Wazuh.</p>
-            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Nmap</span><span class="blog-tag-pill">Network Scanning</span><span class="blog-tag-pill">Reconnaissance</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
+            <div class="note-foot"><span class="note-category">HomeLab Blue Team</span><span class="blog-tag-pill">Blue Team</span><span class="blog-tag-pill">Nmap</span><span class="blog-tag-pill">Network Scanning</span><span class="blog-tag-pill">Reconnaissance</span><span class="blog-tag-pill">Wazuh</span><code class="note-hash"></code></div>
           </div>
         </article>
 
@@ -223,7 +262,7 @@
             <div class="note-meta"><span><svg class="note-icon" aria-hidden="true"><use href="#i-date"/></svg><time datetime="2026-01-14">2026-01-14</time></span><span><svg class="note-icon" aria-hidden="true"><use href="#i-words"/></svg>1,547 words</span><span><svg class="note-icon" aria-hidden="true"><use href="#i-time"/></svg>15 mins</span></div>
             <h3 class="note-title"><a href="https://github.com/th4nhh4i/purple-team-portfolio/tree/main/Lab_BlueTeam/Lab7" target="_blank" rel="noopener noreferrer">Purple Team: Ransomware qua Phishing Email và Disaster Recovery</a></h3>
             <p class="note-excerpt">Mô phỏng vòng đời ransomware từ phishing, PowerShell C2, credential access, lateral movement đến mã hóa và khôi phục Disaster Recovery.</p>
-            <div class="note-foot"><span class="note-category">Lab Report</span><span class="blog-tag-pill">Purple Team</span><span class="blog-tag-pill">Ransomware</span><span class="blog-tag-pill">Phishing</span><span class="blog-tag-pill">Incident Response</span><span class="blog-tag-pill">Disaster Recovery</span><code class="note-hash"></code></div>
+            <div class="note-foot"><span class="note-category">HomeLab Blue Team</span><span class="blog-tag-pill">Purple Team</span><span class="blog-tag-pill">Ransomware</span><span class="blog-tag-pill">Phishing</span><span class="blog-tag-pill">Incident Response</span><span class="blog-tag-pill">Disaster Recovery</span><code class="note-hash"></code></div>
           </div>
         </article>
 
