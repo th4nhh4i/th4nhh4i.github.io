@@ -37,7 +37,7 @@ if (viewport && source) {
     stage.prepend(renderer.domElement);
     renderer.domElement.setAttribute('aria-label', 'Sa bàn 3D hành trình Th4nhH4i');
     document.documentElement.classList.add('roadmap3d-active');
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 700 ? 1 : 1.25));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -62,7 +62,10 @@ if (viewport && source) {
     const sunlight = new THREE.DirectionalLight(0xdcefff, 3.0);
     sunlight.position.set(-14, 26, 15);
     sunlight.castShadow = true;
-    sunlight.shadow.mapSize.set(2048, 2048);
+    sunlight.shadow.mapSize.set(1024, 1024);
+    // The city is static; keep the first shadow map instead of rebuilding it every frame.
+    sunlight.shadow.autoUpdate = false;
+    sunlight.shadow.needsUpdate = true;
     sunlight.shadow.camera.left = -30;
     sunlight.shadow.camera.right = 30;
     sunlight.shadow.camera.top = 30;
@@ -73,8 +76,13 @@ if (viewport && source) {
     rim.position.set(18, 13, -17);
     scene.add(rim);
 
-    const mat = (color, metalness = .35, roughness = .55, emissive = 0x000000, emissiveIntensity = 0) =>
-      new THREE.MeshStandardMaterial({ color, metalness, roughness, emissive, emissiveIntensity });
+    const materialCache = new Map();
+    const mat = (color, metalness = .35, roughness = .55, emissive = 0x000000, emissiveIntensity = 0) => {
+      const key = `${color}:${metalness}:${roughness}:${emissive}:${emissiveIntensity}`;
+      if (!materialCache.has(key)) materialCache.set(key,
+        new THREE.MeshStandardMaterial({ color, metalness, roughness, emissive, emissiveIntensity }));
+      return materialCache.get(key);
+    };
     const graphite = mat(0x182639, .7, .35);
     const asphalt = mat(0x17242e, .3, .9);
     const edgeMetal = mat(0x33506a, .75, .3);
@@ -91,20 +99,30 @@ if (viewport && source) {
     const streetAsphalt = mat(0x263a44, .12, .94);
     const accentMats = [rose, cyan, gold, cyan, rose, gold, cyan];
 
+    const staticMeshes = [];
+    const unitBox = new THREE.BoxGeometry(1, 1, 1);
+    const cylinderCache = new Map();
+    const coneCache = new Map();
+    const crownCache = new Map();
     const box = (parent, w, h, d, x, y, z, material, shadow = true) => {
-      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+      const mesh = new THREE.Mesh(unitBox, material);
       mesh.position.set(x, y, z);
-      mesh.castShadow = shadow;
+      mesh.scale.set(w, h, d);
+      mesh.castShadow = shadow && h > .35 && w > .3 && d > .3;
       mesh.receiveShadow = true;
       parent.add(mesh);
+      staticMeshes.push(mesh);
       return mesh;
     };
     const cylinder = (parent, rt, rb, h, x, y, z, material, sides = 12) => {
-      const mesh = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, sides), material);
+      const key = `${rt}:${rb}:${h}:${sides}`;
+      if (!cylinderCache.has(key)) cylinderCache.set(key, new THREE.CylinderGeometry(rt, rb, h, sides));
+      const mesh = new THREE.Mesh(cylinderCache.get(key), material);
       mesh.position.set(x, y, z);
-      mesh.castShadow = true;
+      mesh.castShadow = h > .4;
       mesh.receiveShadow = true;
       parent.add(mesh);
+      staticMeshes.push(mesh);
       return mesh;
     };
 
@@ -266,10 +284,13 @@ if (viewport && source) {
     const tree = (parent, x, z, scale = 1) => {
       cylinder(parent, .065 * scale, .09 * scale, .55 * scale, x, .27 * scale, z, mat(0x66554d, .05, .95), 8);
       for (let level = 0; level < 3; level++) {
-        const cone = new THREE.Mesh(new THREE.ConeGeometry((.38 - level * .07) * scale, .72 * scale, 7), foliage);
+        if (!coneCache.has(level)) coneCache.set(level, new THREE.ConeGeometry(.38 - level * .07, .72, 7));
+        const cone = new THREE.Mesh(coneCache.get(level), foliage);
         cone.position.set(x, (.65 + level * .31) * scale, z);
+        cone.scale.setScalar(scale);
         cone.castShadow = true;
         parent.add(cone);
+        staticMeshes.push(cone);
       }
       const light = new THREE.Mesh(new THREE.SphereGeometry(.055 * scale, 6, 6), cyan);
       light.position.set(x, 1.42 * scale, z);
@@ -306,10 +327,13 @@ if (viewport && source) {
     const shadeTree = (parent, x, z, scale = 1) => {
       cylinder(parent, .07 * scale, .11 * scale, .7 * scale, x, .3 * scale, z, edgeMetal, 8);
       for (const [dx, dz, size] of [[0, 0, .43], [-.28, .1, .32], [.26, -.12, .34]]) {
-        const crown = new THREE.Mesh(new THREE.IcosahedronGeometry(size * scale, 1), parkGreen);
+        if (!crownCache.has(size)) crownCache.set(size, new THREE.IcosahedronGeometry(size, 1));
+        const crown = new THREE.Mesh(crownCache.get(size), parkGreen);
         crown.position.set(x + dx * scale, 1.02 * scale, z + dz * scale);
+        crown.scale.setScalar(scale);
         crown.castShadow = true;
         parent.add(crown);
+        staticMeshes.push(crown);
       }
     };
     const park = (parent, x, z, seed) => {
@@ -619,6 +643,33 @@ if (viewport && source) {
     box(explorer, .32, .1, .08, 0, 1.25, .17, cyan, false);
     for (const dx of [-.11, .11]) box(explorer, .09, .46, .1, dx, .22, 0, edgeMetal);
 
+    // All scenery is fixed. Reuse geometry and draw equal material/geometry pairs
+    // as one InstancedMesh; only the milestone markers remain individual objects.
+    scene.updateMatrixWorld(true);
+    const batches = new Map();
+    for (const mesh of staticMeshes) {
+      const key = `${mesh.geometry.uuid}:${mesh.material.uuid}:${mesh.castShadow}:${mesh.receiveShadow}`;
+      if (!batches.has(key)) batches.set(key, []);
+      batches.get(key).push(mesh);
+    }
+    let batchedCount = 0;
+    for (const meshes of batches.values()) {
+      if (meshes.length < 2) continue;
+      const sample = meshes[0];
+      const batch = new THREE.InstancedMesh(sample.geometry, sample.material, meshes.length);
+      batch.castShadow = sample.castShadow;
+      batch.receiveShadow = sample.receiveShadow;
+      batch.frustumCulled = false;
+      meshes.forEach((mesh, index) => {
+        batch.setMatrixAt(index, mesh.matrixWorld);
+        mesh.parent.remove(mesh);
+      });
+      batch.instanceMatrix.needsUpdate = true;
+      scene.add(batch);
+      batchedCount += meshes.length;
+    }
+    window.roadmap3dStats = { batchedObjects: batchedCount, batchCount: [...batches.values()].filter(items => items.length > 1).length };
+
     const card = stage.querySelector('.roadmap3d-card');
     const eventSelect = stage.querySelector('.roadmap3d-eventselect');
     let activeIndex = -1;
@@ -719,21 +770,37 @@ if (viewport && source) {
       desired.radius = THREE.MathUtils.clamp(desired.radius * Math.exp(event.deltaY * .001), 9, 100);
     }, { passive: false });
 
+    let stageWidth = 0;
+    let stageHeight = 0;
+    let labelsDirty = true;
     const resize = () => {
       const width = stage.clientWidth;
       const height = stage.clientHeight;
       if (!width || !height) return;
+      stageWidth = width;
+      stageHeight = height;
+      labelsDirty = true;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
     };
     new ResizeObserver(resize).observe(stage);
     resize();
+    let stageVisible = false;
+    new IntersectionObserver(([entry]) => { stageVisible = entry.isIntersecting; }, { rootMargin: '100px' }).observe(stage);
     const clock = new THREE.Clock();
+    const projectedPoint = new THREE.Vector3();
+    let lastRender = 0;
     const animate = () => {
       requestAnimationFrame(animate);
-      const rect = stage.getBoundingClientRect();
-      if (document.hidden || rect.bottom < 0 || rect.top > window.innerHeight) return;
+      if (document.hidden || !stageVisible) return;
+      const moving = Math.abs(desired.theta - orbit.theta) > .0002 ||
+        Math.abs(desired.phi - orbit.phi) > .0002 ||
+        Math.abs(desired.radius - orbit.radius) > .002 ||
+        desired.target.distanceToSquared(orbit.target) > .00002;
+      const now = performance.now();
+      if (!moving && !labelsDirty && now - lastRender < 33) return;
+      lastRender = now;
       const dt = clock.getElapsedTime();
       orbit.theta += (desired.theta - orbit.theta) * .09;
       orbit.phi += (desired.phi - orbit.phi) * .09;
@@ -748,17 +815,19 @@ if (viewport && source) {
       const showMilestoneNames = orbit.radius < 61;
       for (const marker of markerGroups) {
         if (marker.sphere) marker.sphere.position.y = .69 + Math.sin(dt * 1.6 + marker.phase) * .085;
-        if (marker.label) {
-          const projected = marker.anchor.clone().project(camera);
+        if (marker.label && (moving || labelsDirty)) {
+          const projected = projectedPoint.copy(marker.anchor).project(camera);
           const label = marker.label;
-          label.style.left = ((projected.x + 1) * .5 * stage.clientWidth + marker.offsetX) + 'px';
-          label.style.top = ((1 - projected.y) * .5 * stage.clientHeight + marker.offsetY) + 'px';
+          label.style.left = ((projected.x + 1) * .5 * stageWidth + marker.offsetX) + 'px';
+          label.style.top = ((1 - projected.y) * .5 * stageHeight + marker.offsetY) + 'px';
           const visible = showMilestoneNames && projected.z < 1 && Math.abs(projected.x) < 1.12 && Math.abs(projected.y) < 1.12;
           label.style.opacity = visible ? '1' : '0';
           label.style.pointerEvents = visible ? 'auto' : 'none';
         }
       }
+      labelsDirty = false;
       renderer.render(scene, camera);
+      window.roadmap3dStats.drawCalls = renderer.info.render.calls;
     };
     animate();
   }
